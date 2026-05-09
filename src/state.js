@@ -21,4 +21,10 @@ const state = {
             nameEl.classList.add("placeholder");
         }
     },
+
+    hover(id) {
+        const nameEl = document.getElementById("country-name");
+        nameEl.textContent = countries[id] || "Unknown";
+        nameEl.classList.remove("placeholder");
+    },
 };

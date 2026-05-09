@@ -61,21 +61,9 @@ fetch("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json")
             .style("pointer-events", "all")
             .on("mouseover", function (event, d) {
                 const countryId = String(d.id);
-
-                const name = countries[countryId] || "Unknown";
-                document.getElementById("country-name").textContent = name;
-                document
-                    .getElementById("country-name")
-                    .classList.remove("placeholder");
-
                 const related = extradition[countryId] || [];
 
-                group.selectAll("path").attr("fill", function (p) {
-                    const pid = String(p.id);
-                    if (pid === countryId) return COLORS.hover;
-                    if (related.includes(pid)) return COLORS.related;
-                    return COLORS.default;
-                });
+                state.hover(countryId);
 
                 group
                     .selectAll(".country")
@@ -93,27 +81,16 @@ fetch("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json")
             })
 
             .on("mouseout", function () {
-                group.selectAll("path").attr("fill", function (p) {
-                    const pid = String(p.id);
-                    if (pid === state.selectedId) return COLORS.selected;
-                    return COLORS.default;
-                });
+                group
+                    .selectAll(".country")
+                    .attr("fill", function (p) {
+                        const pid = String(p.id);
+                        if (pid === state.selectedId) return COLORS.selected;
+                        return COLORS.default;
+                    })
+                    .attr("stroke", COLORS.related_stroke);
 
-                if (state.selectedId) {
-                    document.getElementById("country-name").textContent =
-                        countries[state.selectedId] || "Unknown";
-                    document
-                        .getElementById("country-name")
-                        .classList.remove("placeholder");
-                } else {
-                    document.getElementById("country-name").textContent =
-                        "Select a country";
-                    document
-                        .getElementById("country-name")
-                        .classList.add("placeholder");
-                }
-
-                group.selectAll(".country").attr("stroke", "#000000");
+                state._update();
             });
     });
 
