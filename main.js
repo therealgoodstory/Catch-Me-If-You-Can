@@ -31,11 +31,11 @@ const path = d3.geoPath().projection(projection);
 fetch("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json")
     .then((r) => r.json())
     .then((world) => {
-        const countries = topojson.feature(world, world.objects.countries);
+        const worldCountries = topojson.feature(world, world.objects.countries);
 
         group
             .selectAll("path")
-            .data(countries.features)
+            .data(worldCountries.features)
             .enter()
             .append("path")
             .attr("data-id", (d) => d.id)
@@ -57,8 +57,13 @@ fetch("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json")
                     return "#1e3a5f";
                 });
             })
+
             .on("mouseout", function () {
-                group.selectAll("path").attr("fill", "#1e3a5f");
+                group.selectAll("path").attr("fill", function (p) {
+                    const pid = String(p.id);
+                    if (pid === selectedId) return "#ff8800";
+                    return "#1e3a5f";
+                });
             });
     });
 
