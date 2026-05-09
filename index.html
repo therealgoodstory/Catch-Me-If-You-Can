@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Catch Me If You Can</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                background: #f1f1f1;
+                color: #fff;
+                font-family: monospace;
+            }
+
+            #map {
+                width: 100vw;
+                height: 100vh;
+                overflow: hidden;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="map"></div>
+
+        <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+        <script src="https://cdn.jsdelivr.net/npm/topojson@3"></script>
+        <script>
+            // HERE
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+
+            const svg = d3
+                .select("#map")
+                .append("svg")
+                .attr("width", width)
+                .attr("height", height);
+
+            const group = svg.append("g");
+
+            const zoom = d3
+                .zoom()
+                .scaleExtent([1, 8])
+                .translateExtent([
+                    [0, 0],
+                    [width, height],
+                ])
+                .on("zoom", (event) => {
+                    group.attr("transform", event.transform);
+                });
+            svg.call(zoom);
+
+            const projection = d3
+                .geoNaturalEarth1()
+                .scale(width / 6.3)
+                .translate([width / 2, height / 2 + 40]);
+
+            const path = d3.geoPath().projection(projection);
+
+            fetch(
+                "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json",
+            )
+                .then((r) => r.json())
+                .then((world) => {
+                    const countries = topojson.feature(
+                        world,
+                        world.objects.countries,
+                    );
+
+                    group
+                        .selectAll("path")
+                        .data(countries.features)
+                        .enter()
+                        .append("path")
+                        .attr("d", path)
+                        .attr("fill", "#1e3a5f")
+                        .attr("stroke", "#4a9eff")
+                        .attr("stroke-width", 0.5);
+                });
+
+            // adadptive
+            window.addEventListener("resize", () => {
+                const newWidth = window.innerWidth;
+                const newHeight = window.innerHeight;
+
+                svg.call(zoom.transform, d3.zoomIdentity);
+
+                svg.attr("width", newWidth).attr("height", newHeight);
+
+                projection
+                    .scale(newWidth / 6.3)
+                    .translate([newWidth / 2, newHeight / 2 + 40]);
+
+                group.selectAll("path").attr("d", path);
+            });
+        </script>
+    </body>
+</html>
