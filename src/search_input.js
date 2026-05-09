@@ -1,6 +1,6 @@
 const searchInput = document.getElementById("search-input");
 const searchBtn = document.getElementById("search-btn");
-let selectedId = null;
+const clearBtn = document.getElementById("clear-btn");
 
 searchInput.addEventListener("keypress", (e) => {
     if (!/[a-zA-Z\s]/.test(e.key)) e.preventDefault();
@@ -13,11 +13,11 @@ function searchCountry() {
     const match = Object.entries(countries).find(([id, name]) =>
         name.toLowerCase().includes(query),
     );
-
     if (!match) return;
 
     const [foundId] = match;
-    selectedId = foundId;
+
+    state.select(foundId);
 
     group.selectAll("path").attr("fill", function (p) {
         const pid = String(p.id);
@@ -36,10 +36,8 @@ searchInput.addEventListener("keydown", (e) => {
     if (e.key === "Enter") searchCountry();
 });
 
-const clearBtn = document.getElementById("clear-btn");
-
 clearBtn.addEventListener("click", () => {
     searchInput.value = "";
-    selectedId = null;
+    state.clear();
     group.selectAll("path").attr("fill", COLORS.default);
 });

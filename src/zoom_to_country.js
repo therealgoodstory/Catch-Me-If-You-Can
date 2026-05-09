@@ -1,4 +1,7 @@
 function zoomToCountry(foundId) {
+    const currentWidth = window.innerWidth;
+    const currentHeight = window.innerHeight;
+
     const countryPath = group
         .selectAll("path")
         .filter((p) => String(p.id) === foundId);
@@ -10,8 +13,8 @@ function zoomToCountry(foundId) {
     const cy = bounds.y + bounds.height / 2;
 
     const scale = 4;
-    const tx = width / 2 - scale * cx;
-    const ty = height / 2 - scale * cy;
+    const tx = currentWidth / 2 - scale * cx;
+    const ty = currentHeight / 2 - scale * cy;
 
     svg.transition()
         .duration(750)

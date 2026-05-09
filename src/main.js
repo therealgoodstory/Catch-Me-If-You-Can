@@ -46,6 +46,13 @@ fetch("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json")
             .style("pointer-events", "all")
             .on("mouseover", function (event, d) {
                 const countryId = String(d.id);
+
+                const name = countries[countryId] || "Unknown";
+                document.getElementById("country-name").textContent = name;
+                document
+                    .getElementById("country-name")
+                    .classList.remove("placeholder");
+
                 const related = extradition[countryId] || [];
 
                 // console.log("id:", countryId, "related:", related);
@@ -61,9 +68,23 @@ fetch("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json")
             .on("mouseout", function () {
                 group.selectAll("path").attr("fill", function (p) {
                     const pid = String(p.id);
-                    if (pid === selectedId) return COLORS.selected;
+                    if (pid === state.selectedId) return COLORS.selected;
                     return COLORS.default;
                 });
+
+                if (state.selectedId) {
+                    document.getElementById("country-name").textContent =
+                        countries[state.selectedId] || "Unknown";
+                    document
+                        .getElementById("country-name")
+                        .classList.remove("placeholder");
+                } else {
+                    document.getElementById("country-name").textContent =
+                        "Select a country";
+                    document
+                        .getElementById("country-name")
+                        .classList.add("placeholder");
+                }
             });
     });
 
@@ -73,6 +94,11 @@ window.addEventListener("resize", () => {
     const newHeight = window.innerHeight;
 
     svg.call(zoom.transform, d3.zoomIdentity);
+
+    zoom.translateExtent([
+        [0, 0],
+        [newWidth, newHeight],
+    ]);
 
     svg.attr("width", newWidth).attr("height", newHeight);
 

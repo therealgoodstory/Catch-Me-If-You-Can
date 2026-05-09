@@ -15,35 +15,40 @@
         <link rel="stylesheet" href="styles/base.css" />
         <link rel="stylesheet" href="styles/map.css" />
         <link rel="stylesheet" href="styles/search.css" />
+        <link rel="stylesheet" href="styles/sidebar.css" />
     </head>
     <body>
         <!--map-->
         <div id="map"></div>
         <!--input search country-->
-        <div id="search-bar">
-            <input
-                type="text"
-                id="search-input"
-                placeholder="Search country..."
-            />
-            <button id="clear-btn">✕</button>
-            <button id="search-btn">→</button>
+        <div id="sidebar">
+            <div id="country-info">
+                <div id="country-name" class="placeholder">
+                    Select a country
+                </div>
+                <div id="country-extradition"></div>
+                <div id="country-description"></div>
+            </div>
+            <div id="search-bar">
+                <input
+                    type="text"
+                    id="search-input"
+                    placeholder="Search country..."
+                />
+                <button id="clear-btn">✕</button>
+                <button id="search-btn">→</button>
+            </div>
         </div>
-
-        <script src="data/constants.js"></script>
-
+        <!--CDN-->
         <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
         <script src="https://cdn.jsdelivr.net/npm/topojson@3"></script>
+
+        <script src="data/constants.js"></script>
+        <script src="data/countries.js"></script>
         <script src="data/data.js"></script>
+        <script src="src/state.js"></script>
         <script src="src/main.js"></script>
         <script src="src/zoom_to_country.js"></script>
-
-        <script src="data/countries.js"></script>
         <script src="src/search_input.js"></script>
-
-        <!--<script>
-            // HERE
-
-        </script>-->
     </body>
 </html>

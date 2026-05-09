@@ -1,0 +1,44 @@
+#sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: var(--info-size);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 20px;
+    z-index: 10;
+}
+
+#country-info {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 16px;
+    border-radius: 4px;
+}
+
+#country-name {
+    font-size: 22px;
+    font-weight: bold;
+    color: #0d1117;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #ddd;
+}
+
+#country-name.placeholder {
+    color: #aaa;
+    font-weight: normal;
+}
+
+#country-extradition {
+    color: #444;
+    font-size: 14px;
+}
+
+#country-description {
+    color: #666;
+    font-size: 14px;
+}
