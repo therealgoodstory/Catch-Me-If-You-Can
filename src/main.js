@@ -40,7 +40,7 @@ fetch("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json")
             .append("path")
             .attr("data-id", (d) => d.id)
             .attr("d", path)
-            .attr("fill", "#1e3a5f")
+            .attr("fill", COLORS.default)
             .attr("stroke", "#4a9eff")
             .attr("stroke-width", 0.5)
             .style("pointer-events", "all")
@@ -52,17 +52,17 @@ fetch("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json")
 
                 group.selectAll("path").attr("fill", function (p) {
                     const pid = String(p.id);
-                    if (pid === countryId) return "#ff4444";
-                    if (related.includes(pid)) return "#44ff88";
-                    return "#1e3a5f";
+                    if (pid === countryId) return COLORS.hover;
+                    if (related.includes(pid)) return COLORS.related;
+                    return COLORS.default;
                 });
             })
 
             .on("mouseout", function () {
                 group.selectAll("path").attr("fill", function (p) {
                     const pid = String(p.id);
-                    if (pid === selectedId) return "#ff8800";
-                    return "#1e3a5f";
+                    if (pid === selectedId) return COLORS.selected;
+                    return COLORS.default;
                 });
             });
     });
