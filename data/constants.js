@@ -1,6 +1,7 @@
 const COLORS = {
-    default: "#1e3a5f",
-    selected: "#ff8800",
-    related: "#44ff88",
-    hover: "#ff4444",
+    default: "#d0d0d0",
+    selected: "#5C1A28",
+    hover: "#5C1A28",
+    related: "#b5aaaa",
+    related_stroke: "#4f4f4f",
 };

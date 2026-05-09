@@ -33,6 +33,20 @@ fetch("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json")
     .then((world) => {
         const worldCountries = topojson.feature(world, world.objects.countries);
 
+        const land = topojson.mesh(
+            world,
+            world.objects.countries,
+            (a, b) => a === b,
+        );
+
+        group
+            .append("path")
+            .datum(land)
+            .attr("d", path)
+            .attr("fill", "none")
+            .attr("stroke", COLORS.related_stroke)
+            .attr("stroke-width", 0.4);
+
         group
             .selectAll("path")
             .data(worldCountries.features)
@@ -41,8 +55,9 @@ fetch("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json")
             .attr("data-id", (d) => d.id)
             .attr("d", path)
             .attr("fill", COLORS.default)
-            .attr("stroke", "#4a9eff")
-            .attr("stroke-width", 0.5)
+            .attr("stroke", COLORS.related_stroke)
+            .attr("stroke-width", 0.1)
+            .attr("class", "country")
             .style("pointer-events", "all")
             .on("mouseover", function (event, d) {
                 const countryId = String(d.id);
@@ -55,14 +70,26 @@ fetch("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json")
 
                 const related = extradition[countryId] || [];
 
-                // console.log("id:", countryId, "related:", related);
-
                 group.selectAll("path").attr("fill", function (p) {
                     const pid = String(p.id);
                     if (pid === countryId) return COLORS.hover;
                     if (related.includes(pid)) return COLORS.related;
                     return COLORS.default;
                 });
+
+                group
+                    .selectAll(".country")
+                    .attr("fill", function (p) {
+                        const pid = String(p.id);
+                        if (pid === countryId) return COLORS.hover;
+                        if (related.includes(pid)) return COLORS.related;
+                        return COLORS.default;
+                    })
+                    .attr("stroke", function (p) {
+                        const pid = String(p.id);
+                        if (related.includes(pid)) return COLORS.hover;
+                        return COLORS.related_stroke;
+                    });
             })
 
             .on("mouseout", function () {
@@ -85,6 +112,8 @@ fetch("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json")
                         .getElementById("country-name")
                         .classList.add("placeholder");
                 }
+
+                group.selectAll(".country").attr("stroke", "#000000");
             });
     });
 

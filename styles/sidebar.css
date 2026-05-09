@@ -1,3 +1,11 @@
+#country-info,
+#search-bar,
+#search-input,
+#search-btn,
+#clear-btn {
+    pointer-events: all;
+}
+
 #sidebar {
     position: fixed;
     top: 0;
@@ -42,12 +50,4 @@
 #country-description {
     color: #666;
     font-size: 14px;
-}
-
-#country-info,
-#search-bar,
-#search-input,
-#search-btn,
-#clear-btn {
-    pointer-events: all;
 }
