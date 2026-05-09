@@ -9,6 +9,7 @@
     justify-content: space-between;
     padding: 20px;
     z-index: 10;
+    pointer-events: none;
 }
 
 #country-info {
@@ -41,4 +42,12 @@
 #country-description {
     color: #666;
     font-size: 14px;
+}
+
+#country-info,
+#search-bar,
+#search-input,
+#search-btn,
+#clear-btn {
+    pointer-events: all;
 }
