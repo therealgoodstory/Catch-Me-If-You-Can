@@ -24,3 +24,13 @@ svg {
         fill 0.15s ease 0.05s,
         stroke 0.15s ease;
 }
+
+#map {
+    /*background-image: url("../assets/map-bg.webp");*/
+    background-size: cover;
+    background-position: center;
+}
+
+image {
+    pointer-events: none;
+}

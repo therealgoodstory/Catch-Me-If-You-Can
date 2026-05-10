@@ -52,6 +52,7 @@ fetch("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json")
             .data(worldCountries.features)
             .enter()
             .append("path")
+            .attr("fill-opacity", 0.5)
             .attr("data-id", (d) => d.id)
             .attr("d", path)
             .attr("fill", COLORS.default)
@@ -92,6 +93,19 @@ fetch("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json")
 
                 state._update();
             });
+
+        group
+            .append("image")
+            .attr("href", "assets/map-bg.webp")
+            .attr("x", 0)
+            .attr("y", -24)
+            .attr("width", 1830)
+            .attr("height", 950)
+            .attr("preserveAspectRatio", "none")
+            .attr("opacity", 0.5)
+            .attr("pointer-events", "none")
+            .style("mix-blend-mode", "multiply")
+            .style("pointer-events", "none");
     });
 
 // adadptive
