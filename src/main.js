@@ -11,7 +11,7 @@ const group = svg.append("g");
 
 const zoom = d3
     .zoom()
-    .scaleExtent([1, 8])
+    .scaleExtent([1, 2])
     .translateExtent([
         [0, 0],
         [width, height],
@@ -52,7 +52,7 @@ fetch("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json")
             .data(worldCountries.features)
             .enter()
             .append("path")
-            .attr("fill-opacity", 0.5)
+            // .attr("fill-opacity", 0.5)
             .attr("data-id", (d) => d.id)
             .attr("d", path)
             .attr("fill", COLORS.default)
