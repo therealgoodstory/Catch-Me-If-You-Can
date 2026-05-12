@@ -94,13 +94,51 @@ fetch("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json")
                 state._update();
             });
 
-        group
+        // const bgImage = group
+        //     .append("image")
+        //     .attr("href", "./assets/map_bg.webp")
+        //     .attr("x", 0)
+        //     .attr("y", -24)
+        //     .attr("width", width)
+        //     .attr("height", height)
+        //     .attr("preserveAspectRatio", "none")
+        //     .attr("opacity", 0.5)
+        //     .style("pointer-events", "none")
+        //     .style("mix-blend-mode", "multiply");
+
+        // const continentsImage = group
+        //     .append("image")
+        //     .attr("href", "./assets/map_continents_1.webp")
+        //     .attr("x", width * 0.14)
+        //     .attr("y", height * 0.14)
+        //     .attr("width", width * 0.83)
+        //     .attr("height", height * 0.87)
+        //     .attr("preserveAspectRatio", "none")
+        //     .attr("opacity", 0.5)
+        //     .style("pointer-events", "none")
+        //     .style("mix-blend-mode", "multiply");
+        //
+        //
+        const bgImage = group
             .append("image")
-            .attr("href", "assets/map-bg.webp")
+            .attr("href", "./assets/map_bg.webp")
             .attr("x", 0)
             .attr("y", -24)
             .attr("width", 1830)
             .attr("height", 950)
+            .attr("preserveAspectRatio", "none")
+            .attr("opacity", 0.5)
+            .attr("pointer-events", "none")
+            .style("mix-blend-mode", "multiply")
+            .style("pointer-events", "none");
+
+        const continentsImage = group
+            .append("image")
+            .attr("href", "./assets/map_continents_1.webp")
+            .attr("x", 252)
+            .attr("y", 110)
+            .attr("width", 1525)
+            .attr("height", 825)
             .attr("preserveAspectRatio", "none")
             .attr("opacity", 0.5)
             .attr("pointer-events", "none")
@@ -127,4 +165,12 @@ window.addEventListener("resize", () => {
         .translate([newWidth / 2, newHeight / 2 + 40]);
 
     group.selectAll("path").attr("d", path);
+
+    // bgImage.attr("width", newWidth).attr("height", newHeight);
+
+    continentsImage
+        .attr("x", newWidth * 0.14)
+        .attr("y", newHeight * 0.14)
+        .attr("width", newWidth * 0.83)
+        .attr("height", newHeight * 0.87);
 });
