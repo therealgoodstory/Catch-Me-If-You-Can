@@ -12,7 +12,7 @@ function zoomToCountry(foundId) {
     const cx = bounds.x + bounds.width / 2;
     const cy = bounds.y + bounds.height / 2;
 
-    const scale = 4;
+    const scale = 2;
     const tx = currentWidth / 2 - scale * cx;
     const ty = currentHeight / 2 - scale * cy;
 
