@@ -23,13 +23,26 @@ svg.call(zoom).on("click.zoom", null);
 
 const projection = d3
     .geoNaturalEarth1()
-    .scale(width / 6.3)
-    .translate([width / 2, height / 2 + 35]);
+    .scale(Math.min(width / 6.3, height / 3.2))
+    .translate([width / 2, height / 2]);
 
 const path = d3.geoPath().projection(projection);
 
 let bgImage, continentsImage;
 const CONTINENTS_ASPECT = 3344 / 1806;
+
+bgImage = group
+    .append("image")
+    .attr("href", "./assets/bg_map.webp")
+    .attr("x", 0)
+    .attr("y", 0)
+    .attr("width", width)
+    .attr("height", height)
+    .attr("preserveAspectRatio", "xMidYMid slice")
+    // .attr("opacity", 0.5)
+    .attr("pointer-events", "none")
+    .style("mix-blend-mode", "multiply")
+    .style("pointer-events", "none");
 
 fetch("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json")
     .then((r) => r.json())
@@ -59,8 +72,8 @@ fetch("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json")
             .attr("data-id", (d) => d.id)
             .attr("d", path)
             .attr("fill", COLORS.default)
-            .attr("stroke", COLORS.selected)
-            .attr("stroke-width", 1)
+            .attr("stroke", COLORS.border)
+            .attr("stroke-width", 0.5)
             .attr("class", "country")
             .style("pointer-events", "all")
             .on("mouseover", function (event, d) {
@@ -69,19 +82,17 @@ fetch("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json")
 
                 state.hover(countryId);
 
-                group
-                    .selectAll(".country")
-                    .attr("fill", function (p) {
-                        const pid = String(p.id);
-                        if (pid === countryId) return COLORS.hover;
-                        if (related.includes(pid)) return COLORS.related;
-                        return COLORS.default;
-                    })
-                    .attr("stroke", function (p) {
-                        const pid = String(p.id);
-                        if (related.includes(pid)) return COLORS.selected;
-                        return COLORS.selected;
-                    });
+                group.selectAll(".country").attr("fill", function (p) {
+                    const pid = String(p.id);
+                    if (pid === countryId) return COLORS.hover;
+                    if (related.includes(pid)) return COLORS.related;
+                    return COLORS.default;
+                });
+                // .attr("stroke", function (p) {
+                //     const pid = String(p.id);
+                //     if (related.includes(pid)) return COLORS.selected;
+                //     return COLORS.selected;
+                // });
             })
 
             .on("mouseout", function () {
@@ -92,32 +103,20 @@ fetch("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json")
                         if (pid === state.selectedId) return COLORS.related;
                         return COLORS.default;
                     })
-                    .attr("stroke", COLORS.selected);
+                    .attr("stroke", "#1a1a1a");
 
                 state._update();
             });
 
-        bgImage = group
-            .append("image")
-            // .attr("href", "./assets/map_bg.webp")
-            .attr("x", 0)
-            .attr("y", 0)
-            .attr("width", width)
-            .attr("height", height)
-            .attr("preserveAspectRatio", "xMidYMid slice")
-            .attr("opacity", 0.5)
-            .attr("pointer-events", "none")
-            .style("mix-blend-mode", "multiply")
-            .style("pointer-events", "none");
-
-        const initW = width * 0.824;
+        const initScale = Math.min(width / 6.3, height / 3.2);
+        const initW = initScale * 5.19;
         const initH = initW / CONTINENTS_ASPECT;
 
         continentsImage = group
             .append("image")
-            .attr("href", "./assets/map_continents_1.webp")
-            .attr("x", width * 0.136)
-            .attr("y", height / 2 + 40 - initH / 2)
+            .attr("href", "./assets/map_continents_3.webp")
+            .attr("x", width / 2 - initScale * 2.29)
+            .attr("y", height / 2 - initH / 2)
             .attr("width", initW)
             .attr("height", initH)
             .attr("preserveAspectRatio", "none")
@@ -141,8 +140,8 @@ window.addEventListener("resize", () => {
     svg.attr("width", newWidth).attr("height", newHeight);
 
     projection
-        .scale(newWidth / 6.3)
-        .translate([newWidth / 2, newHeight / 2 + 35]);
+        .scale(Math.min(newWidth / 6.3, newHeight / 3.2))
+        .translate([newWidth / 2, newHeight / 2]);
 
     group.selectAll("path").attr("d", path);
 
@@ -151,12 +150,12 @@ window.addEventListener("resize", () => {
     }
 
     if (continentsImage) {
-        const s = newWidth / width;
-        const imgW = newWidth * 0.824;
+        const mapScale = Math.min(newWidth / 6.3, newHeight / 3.2);
+        const imgW = mapScale * 5.19;
         const imgH = imgW / CONTINENTS_ASPECT;
         continentsImage
-            .attr("x", newWidth * 0.136)
-            .attr("y", newHeight / 2 + 40 - imgH / 2)
+            .attr("x", newWidth / 2 - mapScale * 2.29)
+            .attr("y", newHeight / 2 - imgH / 2)
             .attr("width", imgW)
             .attr("height", imgH);
     }
