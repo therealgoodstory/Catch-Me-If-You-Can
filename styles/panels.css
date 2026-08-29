@@ -81,15 +81,28 @@
 }
 
 @media (max-width: 768px) {
-  #panel-right {
-    width: auto;
+  #country-hover-name {
+    display: none;
   }
-
+  #panel-left {
+    width: calc(100% - 40px);
+  }
+  #search-bar {
+    width: 100%;
+  }
+  #panel-right {
+    top: auto;
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
+    width: auto;
+    display: flex;
+    flex-direction: column-reverse;
+  }
   #country-extradition,
   #country-source {
     display: none;
   }
-
   #panel-right.expanded #country-extradition,
   #panel-right.expanded #country-source {
     display: block;

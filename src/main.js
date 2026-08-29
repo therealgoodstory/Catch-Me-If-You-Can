@@ -11,9 +11,12 @@ const group = svg.append("g");
 
 const leftOffset = 40
 
+// mobile
+let isMobile = width <= 768;
+
 const zoom = d3
     .zoom()
-    .scaleExtent([1, 2])
+    .scaleExtent([1, isMobile ? 16 : 2])
     .translateExtent([
         [0, 0],
         [width, height],
@@ -60,7 +63,7 @@ fetch("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json")
             .attr("d", path)
             .attr("fill", COLORS.default)
             .attr("stroke", COLORS.border)
-            .attr("stroke-width", 0.5)
+            .style("vector-effect", "non-scaling-stroke")
             .attr("class", "country")
             .style("pointer-events", "all")
             .on("mouseover", function(event, d) {
@@ -155,6 +158,10 @@ window.addEventListener("resize", () => {
             .attr("width", imgW)
             .attr("height", imgH);
     }
+
+    // mobile
+    isMobile = window.innerWidth <= 768;
+    zoom.scaleExtent([1, isMobile ? 16 : 2]);
 });
 
 
