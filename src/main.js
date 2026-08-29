@@ -41,6 +41,10 @@ fetch("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json")
     .then((world) => {
         const worldCountries = topojson.feature(world, world.objects.countries);
 
+        worldCountries.features.forEach(f => {
+          f.id = String(parseInt(f.id, 10));
+        });
+
         const land = topojson.mesh(
             world,
             world.objects.countries,
