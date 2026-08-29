@@ -1,0 +1,81 @@
+#country-info,
+#search-bar,
+#search-input,
+#search-btn,
+#clear-btn {
+    pointer-events: all;
+}
+
+#panel-left {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  width: 300px;
+  z-index: 10;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+#panel-left > * {
+  pointer-events: all;
+}
+
+#country-hover-name {
+  font-size: 16px;
+  color: #1a1a1a;
+  background: rgba(255,255,255,0.92);
+  padding: 10px 14px;
+  border-radius: 4px;
+}
+
+#country-hover-name.placeholder {
+  color: #aaa;
+}
+
+#panel-right {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 300px;
+  z-index: 10;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+#panel-right > * {
+  pointer-events: all;
+}
+
+#country-name {
+  font-size: 22px;
+  font-weight: 500;
+  color: #1a1a1a;
+  background: rgba(255,255,255,0.92);
+  padding: 12px 16px;
+  border-radius: 4px;
+}
+
+#country-name.placeholder {
+  color: #aaa;
+  font-weight: 400;
+  font-size: 16px;
+}
+
+#country-extradition {
+  background: rgba(255,255,255,0.92);
+  border-radius: 4px;
+  padding: 8px 0;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.extradition-item {
+  font-size: 13px;
+  color: #1a1a1a;
+  padding: 8px 16px;
+  border-bottom: 0.5px solid #eee;
+}

@@ -76,39 +76,50 @@ fetch("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json")
             .attr("stroke-width", 0.5)
             .attr("class", "country")
             .style("pointer-events", "all")
-            .on("mouseover", function (event, d) {
-                const countryId = String(d.id);
-                const related = extradition[countryId] || [];
+            .on("mouseover", function(event, d) {
+              const countryId = String(d.id);
+              state.hover(countryId);
 
-                state.hover(countryId);
+              const related = extradition[state.selectedId]?.treaties || [];
 
-                group.selectAll(".country").attr("fill", function (p) {
-                    const pid = String(p.id);
-                    if (pid === countryId) return COLORS.hover;
-                    if (related.includes(pid)) return COLORS.related;
-                    return COLORS.default;
-                });
-                // .attr("stroke", function (p) {
-                //     const pid = String(p.id);
-                //     if (related.includes(pid)) return COLORS.selected;
-                //     return COLORS.selected;
-                // });
+              group.selectAll(".country").attr("fill", function(p) {
+                const pid = String(p.id);
+                if (pid === state.selectedId) return COLORS.selected;
+                if (pid === countryId) return COLORS.hover;
+                if (related.includes(pid)) return COLORS.related;
+                return COLORS.default;
+              });
             })
 
-            .on("mouseout", function () {
-                group
-                    .selectAll(".country")
-                    .attr("fill", function (p) {
-                        const pid = String(p.id);
-                        if (pid === state.selectedId) return COLORS.related;
-                        return COLORS.default;
-                    })
-                    .attr("stroke", "#1a1a1a");
+            .on("mouseout", function() {
+              const related = extradition[state.selectedId]?.treaties || [];
+              group.selectAll(".country").attr("fill", function(p) {
+                const pid = String(p.id);
+                if (pid === state.selectedId) return COLORS.selected;
+                if (related.includes(pid)) return COLORS.related;
+                return COLORS.default;
+              });
+              state._update();
 
-                state._update();
-            });
+              document.getElementById("country-hover-name").textContent = "Hover a country";
+              document.getElementById("country-hover-name").classList.add("placeholder");
+            })
 
-        const initScale = Math.min(width / 6.3, height / 3.2);
+            .on("click", function(event, d) {
+              const countryId = String(d.id);
+              state.select(countryId);
+              state.renderExtradition(countryId);
+
+              group.selectAll(".country").attr("fill", function(p) {
+                const pid = String(p.id);
+                const related = extradition[countryId]?.treaties || [];
+                if (pid === countryId) return COLORS.selected;
+                if (related.includes(pid)) return COLORS.related;
+                return COLORS.default;
+              });
+            })
+
+      const initScale = Math.min(width / 6.3, height / 3.2);
         const initW = initScale * 5.19;
         const initH = initW / CONTINENTS_ASPECT;
 
