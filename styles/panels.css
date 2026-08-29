@@ -79,3 +79,19 @@
   padding: 8px 16px;
   border-bottom: 0.5px solid #eee;
 }
+
+@media (max-width: 768px) {
+  #panel-right {
+    width: auto;
+  }
+
+  #country-extradition,
+  #country-source {
+    display: none;
+  }
+
+  #panel-right.expanded #country-extradition,
+  #panel-right.expanded #country-source {
+    display: block;
+  }
+}

@@ -1,0 +1,15 @@
+.mobile-only {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobile-only {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background: #1a1a1a;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
