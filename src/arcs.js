@@ -24,16 +24,6 @@ function drawArcs(fromId, toIds) {
       .attr("opacity", 0.2)
       .style("pointer-events", "none")
       .style("vector-effect", "non-scaling-stroke");
-
-    // group.append("path")
-    //   .attr("class", "arc")
-    //   .attr("d", arcPath)
-    //   .attr("fill", "none")
-    //   .attr("stroke", COLORS.hover)
-    //   .attr("stroke-width", 0.5)
-    //   .attr("opacity", 0.2)
-    //   .style("pointer-events", "none")
-    //   .style("vector-effect", "non-scaling-stroke");
   });
 }
 

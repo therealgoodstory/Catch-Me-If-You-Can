@@ -81,7 +81,15 @@ async function init() {
         .attr("class", "country")
         .style("pointer-events", "all")
         .on("mouseover", function (event, d) {
+
           const countryId = String(d.id);
+
+          // game
+          if (game.active) {
+            game.hoverPreview(countryId);
+            return;
+          }
+
           state.hover(countryId);
 
           const related = extradition[state.selectedId]?.treaties || [];
@@ -96,6 +104,14 @@ async function init() {
         })
 
         .on("mouseout", function () {
+          // game
+          if (game.active) {
+            document.getElementById("country-hover-name").textContent = "Hover a country";
+            document.getElementById("country-hover-name").classList.add("placeholder");
+            game.paint();
+            return;
+          }
+
           const related = extradition[state.selectedId]?.treaties || [];
           group.selectAll(".country").attr("fill", function (p) {
             const pid = String(p.id);
@@ -111,6 +127,14 @@ async function init() {
 
         .on("click", function (event, d) {
           const countryId = String(d.id);
+
+          //  game
+          if (game.active) {
+            game.handleClick(countryId);
+            return;
+          }
+          //  game
+
           state.select(countryId);
 
           const related = extradition[countryId]?.treaties || [];
