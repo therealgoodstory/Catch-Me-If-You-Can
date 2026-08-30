@@ -16,8 +16,8 @@ function searchCountry() {
     if (!match) return;
 
     const [foundId] = match;
-
     state.select(foundId);
+
     const related = extradition[foundId]?.treaties || [];
 
     group.selectAll(".country").attr("fill", function(p) {
@@ -28,15 +28,7 @@ function searchCountry() {
     });
 
     state.renderExtradition(foundId);
-
-    group.selectAll("path").attr("fill", function (p) {
-        const pid = String(p.id);
-        const related = extradition[countryId]?.treaties || [];
-        if (pid === foundId) return COLORS.selected;
-        if (related.includes(pid)) return COLORS.related;
-        return COLORS.default;
-    });
-
+    drawArcs(foundId, related);
     zoomToCountry(foundId);
 }
 

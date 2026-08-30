@@ -1,22 +1,24 @@
 function zoomToCountry(foundId) {
-    const currentWidth = window.innerWidth;
-    const currentHeight = window.innerHeight;
+  const currentWidth = window.innerWidth;
+  const currentHeight = window.innerHeight;
 
-    const countryPath = group
-        .selectAll("path")
-        .filter((p) => String(p.id) === foundId);
-    const node = countryPath.node();
-    if (!node) return;
+  const countryPath = group
+      .selectAll(".country")
+      .filter((p) => String(p.id) === foundId);
 
-    const bounds = node.getBBox();
-    const cx = bounds.x + bounds.width / 2;
-    const cy = bounds.y + bounds.height / 2;
+  const node = countryPath.node();
 
-    const scale = 2;
-    const tx = currentWidth / 2 - scale * cx;
-    const ty = currentHeight / 2 - scale * cy;
+  if (!node) return;
 
-    svg.transition()
-        .duration(750)
-        .call(zoom.transform, d3.zoomIdentity.translate(tx, ty).scale(scale));
+  const bounds = node.getBBox();
+  const cx = bounds.x + bounds.width / 2;
+  const cy = bounds.y + bounds.height / 2;
+
+  const scale = 2;
+  const tx = currentWidth / 2 - scale * cx;
+  const ty = currentHeight / 2 - scale * cy;
+
+  svg.transition()
+      .duration(750)
+      .call(zoom.transform, d3.zoomIdentity.translate(tx, ty).scale(scale));
 }
