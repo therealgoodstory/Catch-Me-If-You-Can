@@ -17,6 +17,7 @@
         <link rel="stylesheet" href="styles/search.css" />
         <link rel="stylesheet" href="styles/panels.css" />
         <link rel="stylesheet" href="styles/mobile.css" />
+         <link rel="stylesheet" href="styles/modal.css" />
     </head>
     <body>
         <!--map-->
@@ -29,6 +30,7 @@
             <input type="text" id="search-input" placeholder="Search country..." />
             <button id="search-btn">→</button>
           </div>
+          <button id="game-toggle">Game Mode</button>
         </div>
 
         <div id="panel-right">
@@ -37,6 +39,19 @@
           <button id="panel-toggle" class="mobile-only">Details</button>
           <div id="country-extradition"></div>
         </div>
+
+        <div id="game-modal" class="hidden">
+          <div id="game-modal-content">
+            <h2 id="game-modal-title"></h2>
+            <p id="game-modal-reason"></p>
+            <div id="game-modal-count"></div>
+            <div id="game-modal-list"></div>
+            <button id="game-modal-restart">Play Again</button>
+          </div>
+        </div>
+
+        <button id="game-exit" class="hidden">✕</button>
+
         <!--CDN-->
         <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
         <script src="https://cdn.jsdelivr.net/npm/topojson@3"></script>

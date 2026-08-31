@@ -109,9 +109,31 @@ const game = {
 
   end(won, loserCountry) {
     this.active = false;
-    // modal TODO
-    console.log(won ? "WIN" : "LOSE", this.visited, loserCountry);
-     clearArcs();
+    clearArcs();
+
+    const titleEl = document.getElementById("game-modal-title");
+    const reasonEl = document.getElementById("game-modal-reason");
+    const countEl = document.getElementById("game-modal-count");
+    const listEl = document.getElementById("game-modal-list");
+
+    titleEl.textContent = won ? "You win!" : "Caught!";
+
+    if (won) {
+      reasonEl.textContent = "No safe moves left — you escaped every trap.";
+    } else {
+      const fromName = countries[this.currentTarget] || this.currentTarget;
+      const toName = countries[loserCountry] || loserCountry;
+      reasonEl.textContent = `${toName} extradites to ${fromName}.`;
+    }
+
+    countEl.textContent = `Countries visited: ${this.visited.length}`;
+
+    listEl.innerHTML = this.visited
+      .map(id => `<div class="game-modal-item">${countries[id] || id}</div>`)
+      .join("");
+
+    document.getElementById("game-modal").classList.remove("hidden");
+    document.getElementById("game-exit").classList.remove("hidden");
   },
 
   reset() {
@@ -119,6 +141,42 @@ const game = {
     this.visited = [];
     this.currentTarget = null;
     clearArcs();
+    group.selectAll(".country").attr("fill", COLORS.default);
   }
 
 };
+
+//  modal
+document.getElementById("game-modal-restart").addEventListener("click", () => {
+  document.getElementById("game-modal").classList.add("hidden");
+  document.getElementById("game-exit").classList.add("hidden");
+  game.reset();
+  game.start();
+});
+
+// game mode switcher button
+const gameToggle = document.getElementById("game-toggle");
+const gameExit = document.getElementById("game-exit");
+
+gameToggle.addEventListener("click", () => {
+  if (game.active) {
+    game.reset();
+    gameToggle.textContent = "Game Mode";
+    gameExit.classList.add("hidden");
+    state.clear();
+  } else {
+    game.start();
+    gameToggle.textContent = "Exit Game";
+    gameExit.classList.remove("hidden");
+  }
+});
+
+
+// modal close button
+gameExit.addEventListener("click", () => {
+  document.getElementById("game-modal").classList.add("hidden");
+  gameExit.classList.add("hidden");
+  game.reset();
+  gameToggle.textContent = "Game Mode";
+  state.clear();
+});;
