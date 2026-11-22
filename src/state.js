@@ -1,56 +1,157 @@
+// Выбранная страна: состояние, карточка (шторка) и капсула поиска
+
 const state = {
-    selectedId: null,
+  selectedId: null,
 
-    select(id) {
-        this.selectedId = id;
-        this._update();
-        this.renderExtradition(id);
-    },
+  select(id) {
+    this.selectedId = id;
+    renderSheet();
+    renderCapsule();
+  },
 
-    clear() {
-        this.selectedId = null;
-        this._update();
-        document.getElementById("country-extradition").innerHTML = "";
-    },
-
-    _update() {
-      const nameEl = document.getElementById("country-name");
-      const sourceEl = document.getElementById("country-source");
-
-      if (this.selectedId) {
-        nameEl.textContent = countries[this.selectedId] || "Unknown";
-        nameEl.classList.remove("placeholder");
-        const source = extradition[this.selectedId]?.source;
-        if (source) {
-          sourceEl.href = source;
-          sourceEl.textContent = "Source";
-          sourceEl.style.display = "block";
-        }
-      } else {
-        nameEl.textContent = "Select a country";
-        nameEl.classList.add("placeholder");
-        sourceEl.style.display = "none";
-      }
-    },
-
-    hover(id) {
-      const nameEl = document.getElementById("country-hover-name");
-      nameEl.textContent = countries[id] || "Unknown";
-      nameEl.classList.remove("placeholder");
-    },
-
-    renderExtradition(id) {
-        const el = document.getElementById("country-extradition");
-        const related = extradition[id]?.treaties || [];
-
-        if (related.length === 0) {
-            el.innerHTML = "<p>No treaties found</p>";
-            return;
-        }
-
-        const names = related.map((rid) => countries[rid] || rid);
-        el.innerHTML = names
-            .map((name) => `<div class="extradition-item">${name}</div>`)
-            .join("");
-    },
+  clear() {
+    this.selectedId = null;
+    renderSheet();
+    renderCapsule();
+  },
 };
+
+// Выбор страны: карточка, дуги, раскраска, по желанию камера
+function selectCountry(id, { zoom: doZoom = false } = {}) {
+  if (!countries[id] || !mapIds.has(id)) return;
+  state.select(id);
+  drawArcs(id, extradition[id]?.treaties || []);
+  paintMap();
+  if (doZoom) zoomToCountry(id);
+}
+
+function clearSelection({ resetZoom = true } = {}) {
+  state.clear();
+  clearArcs();
+  paintMap();
+  if (resetZoom) resetView();
+}
+
+// ---------- название под курсором ----------
+function setHoverName(id) {
+  const el = document.getElementById("country-hover-name");
+  el.textContent = id ? countryName(id) : t("hover.placeholder");
+  el.classList.toggle("placeholder", !id);
+}
+
+// ---------- карточка страны ----------
+function renderSheet() {
+  const sheet = document.getElementById("sheet");
+  const id = state.selectedId;
+  sheet.classList.toggle("is-empty", !id);
+  if (!id) {
+    sheet.classList.remove("expanded");
+    observeSheetHeight();
+    return;
+  }
+
+  const data = extradition[id];
+  const related = data?.treaties || [];
+
+  document.getElementById("country-eyebrow").textContent =
+    `${t("sheet.selected")} · ${iso3(id)}`;
+  document.getElementById("country-name").textContent = countryName(id);
+
+  const total = Object.keys(countries).length;
+  document.getElementById("tile-treaty").textContent = data ? related.length : "–";
+  document.getElementById("tile-none").textContent = data
+    ? Math.max(0, total - 1 - related.length)
+    : "–";
+
+  const box = document.getElementById("country-extradition");
+  box.replaceChildren();
+  if (!data || related.length === 0) {
+    const p = document.createElement("p");
+    p.className = "muted";
+    p.textContent = t(data ? "sheet.noTreaties" : "sheet.noData");
+    box.append(p);
+  } else {
+    [...related]
+      .sort((a, b) => countryName(a).localeCompare(countryName(b)))
+      .forEach((rid) => {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.className = "chip";
+        const code = document.createElement("span");
+        code.className = "chip-iso";
+        code.textContent = iso3(rid);
+        b.append(code, countryName(rid));
+        if (mapIds.has(rid)) b.addEventListener("click", () => selectCountry(rid, { zoom: true }));
+        else b.disabled = true;
+        box.append(b);
+      });
+  }
+
+  const src = document.getElementById("country-source");
+  if (data?.source) {
+    src.href = data.source;
+    src.textContent = t("sheet.source");
+    src.hidden = false;
+  } else {
+    src.hidden = true;
+  }
+
+  updateToggleLabel();
+  observeSheetHeight();
+}
+
+function updateToggleLabel() {
+  const sheet = document.getElementById("sheet");
+  const n = extradition[state.selectedId]?.treaties?.length || 0;
+  const toggle = document.getElementById("panel-toggle");
+  toggle.hidden = n === 0;
+  document.getElementById("panel-toggle-label").textContent = sheet.classList.contains("expanded")
+    ? t("sheet.less")
+    : t("sheet.seeAll", { n });
+}
+
+document.getElementById("panel-toggle").addEventListener("click", () => {
+  document.getElementById("sheet").classList.toggle("expanded");
+  updateToggleLabel();
+  observeSheetHeight();
+});
+
+// ---------- капсула: поиск и выбранная страна ----------
+function renderCapsule() {
+  const id = state.selectedId;
+  const input = document.getElementById("search-input");
+  const badge = document.getElementById("selected-iso");
+  const clear = document.getElementById("clear-btn");
+  if (id) {
+    input.value = countryName(id);
+    badge.textContent = iso3(id);
+    badge.hidden = false;
+    clear.hidden = false;
+  } else {
+    badge.hidden = true;
+    clear.hidden = input.value === "";
+  }
+}
+
+// ---------- высота шторки -> отступ легенды и зума (--sheet-h) ----------
+let sheetObserver = null;
+
+function syncSheetHeight() {
+  const visible = [document.getElementById("sheet"), document.getElementById("game-sheet")].find(
+    (n) => n && n.getClientRects().length > 0,
+  );
+  const phone = window.innerWidth <= MOBILE_BP;
+  const h = visible && phone ? visible.getBoundingClientRect().height : 0;
+  document.documentElement.style.setProperty("--sheet-h", `${h}px`);
+}
+
+function observeSheetHeight() {
+  if (!sheetObserver) {
+    sheetObserver = new ResizeObserver(syncSheetHeight);
+    sheetObserver.observe(document.getElementById("sheet"));
+    sheetObserver.observe(document.getElementById("game-sheet"));
+    window.addEventListener("resize", syncSheetHeight);
+  }
+  // пересчёт при смене режима (игра / исследование), когда размер шторки мог не измениться
+  requestAnimationFrame(syncSheetHeight);
+}

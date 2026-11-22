@@ -1,69 +1,253 @@
 <!doctype html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Catch Me If You Can</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#06080c" />
+    <title>Catch Me If You Can</title>
 
-        <style>
-            * {
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
-            }
-        </style>
-        <link rel="stylesheet" href="styles/base.css" />
-        <link rel="stylesheet" href="styles/map.css" />
-        <link rel="stylesheet" href="styles/search.css" />
-        <link rel="stylesheet" href="styles/panels.css" />
-        <link rel="stylesheet" href="styles/mobile.css" />
-         <link rel="stylesheet" href="styles/modal.css" />
-    </head>
-    <body>
-        <!--map-->
-        <div id="map"></div>
-        <!--input search country-->
-        <div id="panel-left">
-          <div id="country-hover-name" class="placeholder">Hover a country</div>
-          <div id="search-bar">
-            <button id="clear-btn">✕</button>
-            <input type="text" id="search-input" placeholder="Search country..." />
-            <button id="search-btn">→</button>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700&family=JetBrains+Mono:wght@500;700&family=Space+Grotesk:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="styles/tokens.css" />
+    <link rel="stylesheet" href="styles/base.css" />
+    <link rel="stylesheet" href="styles/map.css" />
+    <link rel="stylesheet" href="styles/search.css" />
+    <link rel="stylesheet" href="styles/panels.css" />
+    <link rel="stylesheet" href="styles/mobile.css" />
+    <link rel="stylesheet" href="styles/modal.css" />
+  </head>
+  <body>
+    <!--map-->
+    <div id="map"></div>
+
+    <!--top bar: brand + play-->
+    <header id="topbar">
+      <div class="brand">
+        <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true">
+          <circle cx="15" cy="15" r="11" fill="none" stroke="#3df5c9" stroke-width="2" />
+          <circle cx="15" cy="15" r="4" fill="#3df5c9" />
+          <path d="M15 1v6M15 23v6M1 15h6M23 15h6" stroke="#3df5c9" stroke-width="2" stroke-linecap="round" />
+        </svg>
+        <h1 class="wordmark">CATCH ME<br />IF YOU CAN</h1>
+      </div>
+      <button id="game-toggle" class="btn-primary btn-play" type="button">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5l11 6.5-11 6.5z" /></svg>
+        <span data-i18n="play">Play</span>
+      </button>
+    </header>
+
+    <!--search + selected country (one capsule)-->
+    <div id="search-wrap">
+      <div id="search-capsule" class="glass">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="M20 20l-3.5-3.5" /></svg>
+        <span id="selected-iso" class="iso iso-selected" hidden></span>
+        <label for="search-input" class="sr-only" data-i18n="search.label">Search country</label>
+        <input
+          type="text"
+          id="search-input"
+          role="combobox"
+          aria-expanded="false"
+          aria-controls="search-results"
+          aria-autocomplete="list"
+          autocomplete="off"
+          autocapitalize="off"
+          spellcheck="false"
+          enterkeyhint="search"
+          data-i18n-attr="placeholder:search.placeholder"
+          placeholder="Search country"
+        />
+        <button id="clear-btn" class="icon-btn" type="button" hidden data-i18n-attr="aria-label:search.clear" aria-label="Clear">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
+        </button>
+      </div>
+      <ul id="search-results" class="glass" role="listbox" hidden></ul>
+      <div id="country-hover-name" class="glass placeholder"></div>
+    </div>
+
+    <!--legend + zoom-->
+    <div id="legend" class="glass">
+      <span class="legend-item legend-explore" style="--dot: var(--c-selected)"><span class="legend-dot"></span><span data-i18n="legend.selected">Selected</span></span>
+      <span class="legend-item legend-explore" style="--dot: var(--c-treaty)"><span class="legend-dot ring"></span><span data-i18n="legend.treaty">Treaty</span></span>
+      <span class="legend-item legend-explore" style="--dot: #3a475f"><span class="legend-dot"></span><span data-i18n="legend.none">No treaty</span></span>
+      <span class="legend-item legend-game" style="--dot: var(--c-selected)"><span class="legend-dot"></span><span data-i18n="legend.you">You</span></span>
+      <span class="legend-item legend-game" style="--dot: var(--c-safe)"><span class="legend-dot ring"></span><span data-i18n="legend.visited">Visited</span></span>
+    </div>
+
+    <div id="zoom-ctl" class="glass">
+      <button id="zoom-in" type="button" data-i18n-attr="aria-label:zoom.in" aria-label="Zoom in">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
+      </button>
+      <span class="sep"></span>
+      <button id="zoom-out" type="button" data-i18n-attr="aria-label:zoom.out" aria-label="Zoom out">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14" /></svg>
+      </button>
+    </div>
+
+    <!--country card (bottom sheet on phones)-->
+    <section id="sheet" class="glass is-empty" aria-label="Country details">
+      <div class="sheet-handle" aria-hidden="true"></div>
+      <div id="sheet-empty">
+        <p class="sheet-empty-title" data-i18n="sheet.empty.title">Select a country</p>
+        <p class="sheet-empty-hint" data-i18n="sheet.empty.hint">Tap a country to see its extradition treaties.</p>
+      </div>
+      <div id="sheet-body">
+        <div class="sheet-head">
+          <p id="country-eyebrow" class="eyebrow"></p>
+          <h2 id="country-name"></h2>
+        </div>
+        <div class="tiles">
+          <div class="tile"><span id="tile-treaty" class="tile-val" style="color: var(--c-treaty)">0</span><span class="tile-label" data-i18n="tile.treaty">Treaty partners</span></div>
+          <div class="tile"><span id="tile-none" class="tile-val">0</span><span class="tile-label" data-i18n="tile.none">No treaty</span></div>
+        </div>
+        <div class="sheet-row">
+          <span class="eyebrow" data-i18n="sheet.partners">Treaty partners</span>
+          <button id="panel-toggle" type="button">
+            <span id="panel-toggle-label"></span>
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" /></svg>
+          </button>
+        </div>
+        <div id="country-extradition" class="chips"></div>
+        <a id="country-source" href="#" target="_blank" rel="noopener" hidden></a>
+      </div>
+    </section>
+
+    <!--game: hud, prompt, route sheet-->
+    <header id="game-hud" class="glass">
+      <button id="game-exit" class="icon-btn" type="button" data-i18n-attr="aria-label:game.exit" aria-label="Exit game">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
+      </button>
+      <div class="spacer"></div>
+      <div class="stat"><span class="eyebrow" data-i18n="game.countries">Countries</span><span id="hud-count" class="stat-val">00</span></div>
+      <div class="stat-sep"></div>
+      <div class="stat"><span class="eyebrow" data-i18n="game.safeLeft">Safe left</span><span id="hud-safe" class="stat-val safe">0</span></div>
+      <div style="width: 14px"></div>
+    </header>
+
+    <div id="game-prompt" class="glass" role="status" aria-live="polite">
+      <span class="prompt-dot"></span>
+      <span id="game-prompt-text"></span>
+    </div>
+
+    <div id="game-hover" class="glass" hidden>
+      <span id="game-hover-iso" class="iso"></span>
+      <span id="game-hover-name"></span>
+      <span id="game-hover-tap" class="muted" data-i18n="game.tapAgain"></span>
+    </div>
+
+    <section id="game-sheet" class="glass" aria-label="Current position and route">
+      <div class="sheet-handle" aria-hidden="true"></div>
+      <div class="sheet-head">
+        <p id="game-eyebrow" class="eyebrow"></p>
+        <h2 id="game-country"></h2>
+      </div>
+      <div>
+        <p class="eyebrow" style="margin-bottom: 8px" data-i18n="game.route">Your route</p>
+        <div id="game-route" class="route"></div>
+      </div>
+      <p id="game-hint" class="hint"></p>
+    </section>
+
+    <!--game result-->
+    <div id="result" hidden role="dialog" aria-modal="true" aria-labelledby="result-count-label">
+      <div class="result-scrim"></div>
+      <header class="result-head">
+        <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true">
+          <circle cx="15" cy="15" r="11" fill="none" stroke="#3df5c9" stroke-width="2" />
+          <circle cx="15" cy="15" r="4" fill="#3df5c9" />
+          <path d="M15 1v6M15 23v6M1 15h6M23 15h6" stroke="#3df5c9" stroke-width="2" stroke-linecap="round" />
+        </svg>
+        <button id="result-close" class="icon-btn glass" type="button" data-i18n-attr="aria-label:result.close" aria-label="Close results">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
+        </button>
+      </header>
+
+      <section class="result-hero">
+        <p id="result-count" class="result-count">0</p>
+        <h2 id="result-count-label" class="result-count-label"></h2>
+      </section>
+
+      <div id="result-map-slot" aria-hidden="true"></div>
+
+      <section id="result-caught" class="caught" aria-label="Where you were caught">
+        <div class="caught-shape">
+          <svg width="64" height="64" viewBox="-7 -7 64 64" aria-hidden="true"><path id="caught-path" d="" /></svg>
+        </div>
+        <div class="caught-text">
+          <p id="caught-eyebrow" class="eyebrow"></p>
+          <h2 id="caught-name"></h2>
+          <p id="caught-sub"></p>
+        </div>
+      </section>
+
+      <section class="rank glass" aria-label="Rank">
+        <svg width="56" height="56" viewBox="0 0 56 56" aria-hidden="true" style="flex: none">
+          <path d="M28 3l22 12.5v25L28 53 6 40.5v-25z" fill="rgba(61,245,201,.12)" stroke="#3df5c9" stroke-width="2" stroke-linejoin="round" />
+          <path d="M28 17l9 11-9 11-9-11z" fill="#3df5c9" />
+        </svg>
+        <div class="rank-body">
+          <div class="rank-line">
+            <span class="eyebrow" data-i18n="result.rank">Rank</span>
+            <span id="rank-next" class="rank-next"></span>
           </div>
-          <button id="game-toggle">Game Mode</button>
-        </div>
-
-        <div id="panel-right">
-          <div id="country-name" class="placeholder">Select a country</div>
-          <a id="country-source" href="#" target="_blank"></a>
-          <button id="panel-toggle" class="mobile-only">Details</button>
-          <div id="country-extradition"></div>
-        </div>
-
-        <div id="game-modal" class="hidden">
-          <div id="game-modal-content">
-            <h2 id="game-modal-title"></h2>
-            <p id="game-modal-reason"></p>
-            <div id="game-modal-count"></div>
-            <div id="game-modal-list"></div>
-            <button id="game-modal-restart">Play Again</button>
+          <p id="rank-name"></p>
+          <div id="rank-bar" class="rank-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+            <div id="rank-fill" style="width: 0"></div>
           </div>
         </div>
+      </section>
 
-        <button id="game-exit" class="hidden">✕</button>
+      <div class="tiles result-tiles">
+        <div class="tile"><span id="res-world" class="tile-val">0%</span><span class="tile-label" data-i18n="result.world">World covered</span></div>
+        <div class="tile"><span id="res-km" class="tile-val">0</span><span class="tile-label" data-i18n="result.km">km fled</span></div>
+        <div class="tile tile-best">
+          <span class="tile-val-row"><span id="res-best" class="tile-val">0</span><span id="res-new" class="badge-new" hidden data-i18n="result.new">NEW</span></span>
+          <span class="tile-label" data-i18n="result.best">Personal best</span>
+        </div>
+      </div>
 
-        <!--CDN-->
-        <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
-        <script src="https://cdn.jsdelivr.net/npm/topojson@3"></script>
+      <div class="result-actions">
+        <button id="result-restart" class="btn-primary" type="button">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" style="fill: currentColor; stroke: none"><path d="M8 5.5l11 6.5-11 6.5z" /></svg>
+          <span data-i18n="result.playAgain">Play again</span>
+        </button>
+        <div class="result-actions-row">
+          <button id="result-share" class="btn-ghost" type="button">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3M8 7l4-4 4 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" /></svg>
+            <span id="result-share-label" data-i18n="result.share">Share</span>
+          </button>
+          <button id="result-back" class="btn-ghost" type="button">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V4M5 4h11l-2 4 2 4H5" /></svg>
+            <span data-i18n="result.back">Back to map</span>
+          </button>
+        </div>
+      </div>
+    </div>
 
-        <script src="data/constants.js"></script>
-        <script src="data/countries.js"></script>
-        <script src="src/load_data.js"></script>
-        <script src="src/state.js"></script>
-        <script src="src/main.js"></script>
-        <script src="src/game.js"></script>
-        <script src="src/arcs.js"></script>
-        <script src="src/zoom_to_country.js"></script>
-        <script src="src/search_input.js"></script>
-    </body>
+    <!--CDN-->
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+    <script src="https://cdn.jsdelivr.net/npm/topojson@3"></script>
+
+    <script src="data/constants.js"></script>
+    <script src="data/countries.js"></script>
+    <script src="data/iso.js"></script>
+    <script src="src/i18n.js"></script>
+    <script src="src/load_data.js"></script>
+    <script src="src/arcs.js"></script>
+    <script src="src/paint.js"></script>
+    <script src="src/zoom_to_country.js"></script>
+    <script src="src/state.js"></script>
+    <script src="src/search_input.js"></script>
+    <script src="src/game.js"></script>
+    <script src="src/result.js"></script>
+    <!-- main.js is last: it starts the app -->
+    <script src="src/main.js"></script>
+  </body>
 </html>

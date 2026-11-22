@@ -1,52 +1,124 @@
-#search-bar {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 4px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+/* Капсула: поиск и выбранная страна в одном элементе */
+#search-capsule {
+  height: 54px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 6px 0 18px;
+  border-radius: 27px;
+}
+
+#search-capsule .icon {
+  color: var(--c-text-3);
+}
+
+#search-capsule:focus-within {
+  border-color: rgba(242, 245, 250, 0.65);
 }
 
 #search-input {
-    flex: 1;
-    min-width: 0;
-    padding: 12px 16px;
-    background: transparent;
-    border: none;
-    color: #0d1117;
-    font-family: monospace;
-    font-size: 16px;
-    outline: none;
+  flex: 1;
+  min-width: 0;
+  height: var(--hit);
+  background: transparent;
+  border: 0;
+  outline: 0;
+  color: var(--c-text);
+  font-size: var(--fs-lg);
+  font-weight: 600;
 }
 
 #search-input::placeholder {
-    color: #888;
-}
-
-#search-btn {
-    padding: 12px 16px;
-    background: transparent;
-    border: none;
-    border-left: 1px solid #ddd;
-    color: #1e3a5f;
-    font-size: 16px;
-    cursor: pointer;
-}
-
-#search-btn:hover {
-    color: #4a9eff;
-}
-
-#clear-btn {
-    padding: 12px 16px;
-    background: transparent;
-    border: none;
-    border-right: 1px solid #ddd;
-    color: #888;
-    font-size: 16px;
-    cursor: pointer;
+  color: var(--c-text-3);
+  font-weight: 500;
 }
 
 #clear-btn:hover {
-    color: #ff4444;
+  color: var(--c-selected-soft);
+}
+
+/* список результатов */
+#search-results {
+  list-style: none;
+  margin-top: var(--s-2);
+  padding: 6px 0;
+  border-radius: var(--r-lg);
+  max-height: 60dvh;
+  overflow-y: auto;
+}
+
+.search-item {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  min-height: 60px;
+  padding: 0 18px 0 16px;
+  cursor: pointer;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.search-item:first-child {
+  border-top: 0;
+}
+
+.search-item[aria-selected="true"],
+.search-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.search-item-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.search-item-name mark {
+  background: none;
+  color: var(--c-selected);
+}
+
+.search-item-count {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.search-item-count b {
+  font: 700 16px / 1 var(--font-mono);
+  color: var(--c-treaty);
+}
+
+.search-item-count span {
+  font-size: var(--fs-xs);
+  color: var(--c-text-3);
+}
+
+.search-empty {
+  padding: var(--s-4) 18px;
+  color: var(--c-text-3);
+  font-size: var(--fs-sm);
+}
+
+/* название страны под курсором (только десктоп) */
+#country-hover-name {
+  display: none;
+  align-self: flex-start;
+  margin-top: var(--s-2);
+  padding: 10px 14px;
+  border-radius: var(--r-md);
+  font-size: var(--fs-md);
+  font-weight: 600;
+}
+
+#country-hover-name.placeholder {
+  color: var(--c-text-3);
+  font-weight: 500;
+}
+
+@media (hover: hover) and (min-width: 769px) {
+  #country-hover-name {
+    display: block;
+  }
 }

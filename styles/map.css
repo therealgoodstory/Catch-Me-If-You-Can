@@ -1,36 +1,185 @@
-svg {
-    pointer-events: all;
-}
-
 #map {
-    width: 100vw;
-    height: 100vh;
-    overflow: hidden;
-    /*padding: 20px 0;*/
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  background: radial-gradient(
+    ellipse at 50% 40%,
+    #0b1018 0,
+    var(--c-bg) 70%
+  );
 }
 
 #map svg {
-    filter: drop-shadow(0px 4px 12px rgba(0, 0, 0, 0.15));
+  display: block;
+  touch-action: none;
+  transform-origin: 0 0;
+  transition: transform 0.6s var(--ease);
 }
 
-#map path {
-    transition:
-        fill 0.3s ease 0.05s,
-        stroke 0.3s ease;
+/* суша */
+.country,
+.land {
+  stroke-linejoin: round;
+  fill: var(--c-land);
+  stroke: var(--c-land-stroke);
+  stroke-width: 0.6px;
+  vector-effect: non-scaling-stroke;
 }
 
-#map path:not(:hover) {
-    transition:
-        fill 0.15s ease 0.05s,
-        stroke 0.15s ease;
+.country {
+  cursor: pointer;
+  transition:
+    fill var(--dur) var(--ease),
+    stroke var(--dur) var(--ease);
 }
 
-#map {
-    /*background-image: url("../assets/map-bg.webp");*/
-    background-size: cover;
-    background-position: center;
+.land {
+  pointer-events: none;
 }
 
-image {
-    pointer-events: none;
+.graticule {
+  fill: none;
+  stroke: url(#grat-grad);
+  stroke-width: 0.6px;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+}
+
+/* состояния страны (классы ставит paintMap) */
+.country.is-hover {
+  fill: var(--c-land-hover);
+}
+
+.country.is-partner,
+.country.is-danger {
+  fill: var(--c-treaty-fill);
+  stroke: var(--c-treaty);
+  stroke-width: 0.9px;
+}
+
+.country.is-partner.is-hover,
+.country.is-danger.is-hover {
+  fill: var(--c-treaty-fill-hover);
+  stroke: var(--c-treaty-soft);
+  stroke-width: 1.4px;
+}
+
+.country.is-visited {
+  fill: var(--c-safe-fill);
+  stroke: var(--c-safe);
+  stroke-width: 0.9px;
+}
+
+.country.is-selected,
+.country.is-current {
+  fill: var(--c-selected-fill);
+  stroke: var(--c-selected);
+  stroke-width: 1.2px;
+}
+
+/* где поймали: янтарный, цвет договора */
+.country.is-caught {
+  fill: var(--c-treaty);
+  stroke: var(--c-treaty-soft);
+  stroke-width: 1.2px;
+}
+
+/* свечение линий: второй широкий полупрозрачный штрих вместо drop-shadow */
+.arc-glow,
+.trail-glow {
+  fill: none;
+  stroke: var(--c-treaty);
+  stroke-width: 6px;
+  stroke-opacity: 0.16;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.trail-glow {
+  stroke: var(--c-safe);
+}
+
+/* дуги и маркеры */
+.overlay {
+  pointer-events: none;
+}
+
+.arc {
+  fill: none;
+  stroke: var(--c-treaty);
+  stroke-width: 1.3px;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+  opacity: 0.95;
+}
+
+.trail {
+  fill: none;
+  stroke: var(--c-safe);
+  stroke-width: 1.6px;
+  stroke-linecap: round;
+  stroke-dasharray: 1 5;
+  vector-effect: non-scaling-stroke;
+}
+
+.trail-fatal {
+  fill: none;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+  stroke: var(--c-treaty);
+  stroke-dasharray: none;
+  stroke-width: 1.6px;
+}
+
+.marker-dot {
+  fill: var(--c-treaty);
+}
+
+.marker-ring {
+  fill: none;
+  stroke: var(--c-treaty);
+  stroke-opacity: 0.35;
+  vector-effect: non-scaling-stroke;
+}
+
+.marker-origin {
+  fill: #fff;
+  stroke: var(--c-selected);
+  stroke-width: 2px;
+  vector-effect: non-scaling-stroke;
+}
+
+.marker-origin-ring {
+  fill: none;
+  stroke: var(--c-selected);
+  stroke-opacity: 0.5;
+  vector-effect: non-scaling-stroke;
+}
+
+.marker-trail {
+  fill: #e8fff9;
+}
+
+.marker-start {
+  fill: var(--c-bg);
+  stroke: var(--c-safe);
+  stroke-width: 2px;
+  vector-effect: non-scaling-stroke;
+}
+
+.marker-fatal {
+  fill: #fff;
+  stroke: var(--c-selected);
+  stroke-width: 2px;
+  vector-effect: non-scaling-stroke;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #map svg,
+  .country {
+    transition: none;
+  }
 }

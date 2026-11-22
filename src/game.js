@@ -1,182 +1,197 @@
+// Игровой режим: перелетай между странами и избегай тех, у кого есть договор
+// об экстрадиции с текущей. Экран итогов живёт в src/result.js.
+
 const game = {
   active: false,
+  resultShown: false,
+  won: false,
   visited: [],
   currentTarget: null,
+  caughtId: null, // страна, куда прыгнул игрок и где его поймали
+  finalId: null, // подсвечиваемая на итогах страна (поймали / последняя безопасная)
+  pending: null, // тач: первая страна из двух касаний
 
   start() {
-    const ids = Object.keys(extradition).filter(id => worldCountries.features.some(f => f.id === id));
-    const randomId = ids[Math.floor(Math.random() * ids.length)];
+    const ids = Object.keys(extradition).filter((id) => mapIds.has(id));
+    const startId = ids[Math.floor(Math.random() * ids.length)];
 
     this.active = true;
-    this.visited = [randomId];
-    this.currentTarget = randomId;
+    this.resultShown = false;
+    this.won = false;
+    this.caughtId = null;
+    this.finalId = null;
+    this.pending = null;
+    this.visited = [startId];
+    this.currentTarget = startId;
 
-    this.updatePanel(randomId);
-    this.paint();
-    this.drawPath();
+    document.body.classList.add("in-game");
+    document.body.classList.remove("show-result");
+    clearSelection({ resetZoom: false });
+    setHoverName(null);
+    resetView(true, 1.3);
+    this.render();
+    observeSheetHeight();
   },
 
-  updatePanel(countryId) {
-    const nameEl = document.getElementById("country-name");
-    nameEl.textContent = countries[countryId] || "Unknown";
-    nameEl.classList.remove("placeholder");
-
-    document.getElementById("country-extradition").innerHTML = "";
-    document.getElementById("country-source").style.display = "none";
-  },
-
-  handleClick(countryId) {
-    if (!this.active) return;
-    if (this.visited.includes(countryId)) return;
-    const related = extradition[this.currentTarget]?.treaties || [];
-    if (related.includes(countryId)) {
-      this.end(false, countryId);
-      return;
-    }
-    this.visited.push(countryId);
-    this.currentTarget = countryId;
-    this.updatePanel(countryId);
-    this.paint();
-    this.drawPath();
-    if (this.isDeadEnd()) {
-      this.end(true, null);
-    }
+  // сколько безопасных ходов осталось
+  safeMoves() {
+    const related = new Set(extradition[this.currentTarget]?.treaties || []);
+    const seen = new Set(this.visited);
+    let n = 0;
+    for (const id of mapIds) if (!seen.has(id) && !related.has(id)) n++;
+    return n;
   },
 
   isDeadEnd() {
+    return this.safeMoves() === 0;
+  },
+
+  handleClick(id) {
+    if (!this.active) return;
+    if (!mapIds.has(id)) return;
+
+    // на тач-экране первое касание показывает название, второе совершает прыжок
+    if (isTouch()) {
+      if (this.visited.includes(id)) {
+        this.pending = null;
+        showGameHover(id);
+        paintMap();
+        return;
+      }
+      if (this.pending !== id) {
+        this.pending = id;
+        this.render();
+        return;
+      }
+    } else if (this.visited.includes(id)) return;
+    this.pending = null;
+
     const related = extradition[this.currentTarget]?.treaties || [];
-    return worldCountries.features.every(f => {
-      const id = f.id;
-      if (this.visited.includes(id)) return true;
-      return related.includes(id);
-    });
-  },
-
-  paint() {
-    group.selectAll(".country").attr("fill", (p) => {
-      const pid = String(p.id);
-      if (this.visited.includes(pid)) return COLORS.visited;
-      return COLORS.default;
-    });
-  },
-
-  hoverPreview(countryId) {
-    if (this.visited.includes(countryId)) return;
-
-    const nameEl = document.getElementById("country-hover-name");
-    nameEl.textContent = countries[countryId] || "Unknown";
-    nameEl.classList.remove("placeholder");
-
-    group.selectAll(".country").attr("fill", (p) => {
-      const pid = String(p.id);
-      if (this.visited.includes(pid)) return COLORS.visited;
-      if (pid === countryId) return COLORS.hover;
-      return COLORS.default;
-    });
-  },
-
-  // lines
-  drawPath() {
-    clearArcs();
-
-    for (let i = 0; i < this.visited.length - 1; i++) {
-      const fromId = this.visited[i];
-      const toId = this.visited[i + 1];
-
-      const fromFeature = worldCountries.features.find(f => f.id === fromId);
-      const toFeature = worldCountries.features.find(f => f.id === toId);
-      if (!fromFeature || !toFeature) continue;
-
-      const fromCentroid = path.centroid(fromFeature);
-      const toCentroid = path.centroid(toFeature);
-
-      const mx = (fromCentroid[0] + toCentroid[0]) / 2;
-      const my = (fromCentroid[1] + toCentroid[1]) / 2 - 30;
-
-      const arcPath = `M${fromCentroid[0]},${fromCentroid[1]} Q${mx},${my} ${toCentroid[0]},${toCentroid[1]}`;
-
-      group.append("path")
-        .attr("class", "arc game-arc")
-        .attr("d", arcPath)
-        .attr("fill", "none")
-        .attr("stroke", COLORS.selected)
-        .attr("stroke-width", 2)
-        .attr("opacity", 0.9)
-        .style("pointer-events", "none")
-        .style("vector-effect", "non-scaling-stroke");
-    }
-  },
-
-  end(won, loserCountry) {
-    this.active = false;
-    clearArcs();
-
-    const titleEl = document.getElementById("game-modal-title");
-    const reasonEl = document.getElementById("game-modal-reason");
-    const countEl = document.getElementById("game-modal-count");
-    const listEl = document.getElementById("game-modal-list");
-
-    titleEl.textContent = won ? "You win!" : "Caught!";
-
-    if (won) {
-      reasonEl.textContent = "No safe moves left — you escaped every trap.";
-    } else {
-      const fromName = countries[this.currentTarget] || this.currentTarget;
-      const toName = countries[loserCountry] || loserCountry;
-      reasonEl.textContent = `${toName} extradites to ${fromName}.`;
+    if (related.includes(id)) {
+      this.end(false, id);
+      return;
     }
 
-    countEl.textContent = `Countries visited: ${this.visited.length}`;
-
-    listEl.innerHTML = this.visited
-      .map(id => `<div class="game-modal-item">${countries[id] || id}</div>`)
-      .join("");
-
-    document.getElementById("game-modal").classList.remove("hidden");
-    document.getElementById("game-exit").classList.remove("hidden");
+    this.visited.push(id);
+    this.currentTarget = id;
+    this.render();
+    if (this.isDeadEnd()) this.end(true, null);
   },
 
-  reset() {
+  hoverPreview(id) {
+    if (!mapIds.has(id)) return;
+    showGameHover(id);
+    paintMap(this.visited.includes(id) ? null : id);
+  },
+
+  render() {
+    paintMap(this.pending);
+    drawTrail(this.visited);
+    this.updateHud();
+    if (this.pending) showGameHover(this.pending, true);
+    else if (isTouch()) showGameHover(null);
+    this.updatePrompt();
+    this.updateSheet();
+  },
+
+  updateHud() {
+    document.getElementById("hud-count").textContent = String(this.visited.length).padStart(2, "0");
+    document.getElementById("hud-safe").textContent = this.safeMoves();
+  },
+
+  updatePrompt() {
+    document.getElementById("game-prompt-text").textContent = t("game.prompt", {
+      country: countryName(this.currentTarget),
+    });
+  },
+
+  updateSheet() {
+    const cur = this.currentTarget;
+    document.getElementById("game-eyebrow").textContent = `${t("game.youAreIn")} · ${iso3(cur)}`;
+    document.getElementById("game-country").textContent = countryName(cur);
+    document.getElementById("game-hint").textContent = isTouch()
+      ? t("game.hintTouch")
+      : t("game.hint", { country: countryName(cur) });
+
+    const route = document.getElementById("game-route");
+    route.replaceChildren();
+    const tail = this.visited.slice(-5);
+    tail.forEach((id, i) => {
+      if (i > 0) route.append(chevron());
+      const chip = document.createElement("span");
+      chip.className = "route-chip" + (id === cur ? " is-current" : "");
+      chip.textContent = iso3(id);
+      route.append(chip);
+    });
+    route.scrollLeft = route.scrollWidth;
+    observeSheetHeight();
+  },
+
+  end(won, caughtId) {
     this.active = false;
+    this.resultShown = true;
+    this.won = won;
+    this.caughtId = caughtId;
+    this.finalId = won ? this.currentTarget : caughtId;
+    this.pending = null;
+
+    document.body.classList.remove("in-game");
+    document.body.classList.add("show-result");
+    setHoverName(null);
+    showGameHover(null);
+
+    // вся карта целиком, маршрут поверх
+    svg.call(zoom.transform, d3.zoomIdentity);
+    paintMap();
+    drawTrail(this.visited, caughtId);
+    showResult(this);
+  },
+
+  exit() {
+    this.active = false;
+    this.resultShown = false;
+    this.won = false;
     this.visited = [];
     this.currentTarget = null;
-    clearArcs();
-    group.selectAll(".country").attr("fill", COLORS.default);
-  }
+    this.caughtId = null;
+    this.finalId = null;
+    this.pending = null;
 
+    document.body.classList.remove("in-game", "show-result");
+    hideResult();
+    showGameHover(null);
+    clearArcs();
+    paintMap();
+    setHoverName(null);
+    resetView();
+    observeSheetHeight();
+  },
 };
 
-//  modal
-document.getElementById("game-modal-restart").addEventListener("click", () => {
-  document.getElementById("game-modal").classList.add("hidden");
-  document.getElementById("game-exit").classList.add("hidden");
-  game.reset();
-  game.start();
-});
-
-// game mode switcher button
-const gameToggle = document.getElementById("game-toggle");
-const gameExit = document.getElementById("game-exit");
-
-gameToggle.addEventListener("click", () => {
-  if (game.active) {
-    game.reset();
-    gameToggle.textContent = "Game Mode";
-    gameExit.classList.add("hidden");
-    state.clear();
-  } else {
-    game.start();
-    gameToggle.textContent = "Exit Game";
-    gameExit.classList.remove("hidden");
+// Плашка с названием страны в игре. withTap: подсказка «коснись ещё раз» (тач)
+function showGameHover(id, withTap = false) {
+  const el = document.getElementById("game-hover");
+  if (!id) {
+    el.hidden = true;
+    return;
   }
-});
+  document.getElementById("game-hover-iso").textContent = iso3(id);
+  document.getElementById("game-hover-name").textContent = countryName(id);
+  document.getElementById("game-hover-tap").hidden = !withTap;
+  el.hidden = false;
+}
 
+function chevron() {
+  const ns = "http://www.w3.org/2000/svg";
+  const svgEl = document.createElementNS(ns, "svg");
+  svgEl.setAttribute("class", "icon");
+  svgEl.setAttribute("viewBox", "0 0 24 24");
+  svgEl.setAttribute("aria-hidden", "true");
+  const p = document.createElementNS(ns, "path");
+  p.setAttribute("d", "M9 6l6 6-6 6");
+  svgEl.append(p);
+  return svgEl;
+}
 
-// modal close button
-gameExit.addEventListener("click", () => {
-  document.getElementById("game-modal").classList.add("hidden");
-  gameExit.classList.add("hidden");
-  game.reset();
-  gameToggle.textContent = "Game Mode";
-  state.clear();
-});;
+document.getElementById("game-toggle").addEventListener("click", () => game.start());
+document.getElementById("game-exit").addEventListener("click", () => game.exit());

@@ -1,0 +1,80 @@
+/* Design tokens: единственное место, где живут цвета, шрифты, размеры.
+   Остальной CSS и JS ссылаются на них через var(--...). */
+:root {
+  /* фон и суша */
+  --c-bg: #06080c;
+  --c-land: #1a2335;
+  --c-land-hover: #243049;
+  --c-land-stroke: #0a0e16;
+  --c-grid-line: #ffffff; /* сетка: цвет и сила в центре, к краям растворяется */
+  --c-grid-op: 0.08;
+
+  /* акценты, у каждого свой смысл */
+  --c-selected: #3df5c9; /* выбранная страна, «вы» в игре */
+  --c-selected-ink: #04201a; /* текст на мятном */
+  --c-selected-soft: #7ff8de; /* мятный текст на тёмном */
+  --c-selected-edge: #d5fff4;
+  --c-selected-fill: rgba(61, 245, 201, 0.26); /* заливка выбранной, той же прозрачности, что у партнёров */
+  --c-treaty: #ffb224; /* договор об экстрадиции */
+  --c-treaty-soft: #ffd27a;
+  --c-treaty-fill: rgba(255, 178, 36, 0.26);
+  --c-treaty-fill-hover: rgba(255, 178, 36, 0.52); /* ховер на стране-партнёре */
+  --c-safe: #3df5c9; /* игра: путь, безопасный ход */
+  --c-safe-ink: #04201a;
+  --c-safe-fill: rgba(61, 245, 201, 0.3);
+
+  /* текст */
+  --c-text: #f2f5fa;
+  --c-text-2: #cfd6e4;
+  --c-text-3: #9aa4b8;
+
+  /* поверхности */
+  --glass-bg: rgba(13, 18, 29, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.09);
+  --glass-blur: 18px;
+  --tile-bg: rgba(255, 255, 255, 0.045);
+  --tile-border: rgba(255, 255, 255, 0.08);
+  --divider: rgba(255, 255, 255, 0.1);
+
+  /* шрифты: браузер берёт запасной шрифт по каждому символу
+     (кириллица, иероглифы, хангыль) */
+  --font-ui: "Space Grotesk", "Inter", "Noto Sans SC", "Noto Sans KR",
+    system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo,
+    Consolas, monospace;
+
+  /* размеры */
+  --fs-xs: 11px;
+  --fs-sm: 13px;
+  --fs-md: 15px;
+  --fs-lg: 18px;
+  --fs-title: 32px;
+  --fs-hero: 96px;
+
+  --r-sm: 8px;
+  --r-md: 16px;
+  --r-lg: 24px;
+  --r-xl: 28px;
+  --r-pill: 999px;
+
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 20px;
+  --s-6: 24px;
+
+  --hit: 44px; /* минимальная область нажатия */
+  --panel-w: 420px; /* ширина левой колонки на десктопе */
+  --sheet-w: 360px; /* ширина карточки страны на десктопе */
+
+  /* движение и слои */
+  --dur: 160ms;
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --z-ui: 10;
+  --z-sheet: 20;
+  --z-modal: 30;
+
+  /* высота нижней шторки, обновляется из JS (легенда и зум ставятся над ней) */
+  --sheet-h: 0px;
+}

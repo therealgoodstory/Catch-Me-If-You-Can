@@ -1,9 +1,19 @@
-const COLORS = {
-  default: "#d0d0d0",
-  selected: "#5C1A28",
-  hover: "#5C1A28",
-  related: "#9e5a5a",
-  related_stroke: "#4f4f4f",
-  border: "#1a1a1a",
-  visited : "#333333"
+// Цвета и размеры живут в styles/tokens.css. Здесь только настройки логики.
+const WORLD_URL =
+  "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
+
+const MOBILE_BP = 768; // px: ниже этой ширины интерфейс телефонный
+
+const GAME = {
+  showDanger: false, // true: подсвечивать страны с договором (игра становится проще)
 };
+
+// Ранги по числу пройденных стран
+const RANKS = [
+  { key: "rookie", min: 0 },
+  { key: "runner", min: 10 },
+  { key: "phantom", min: 20 },
+  { key: "legend", min: 30 },
+];
+
+const STORAGE_BEST = "cmic.best.v1";

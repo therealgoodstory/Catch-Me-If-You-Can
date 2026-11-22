@@ -1,45 +1,161 @@
+// Капсула поиска: поиск только по латинице (английские названия и ISO-коды)
+
 const searchInput = document.getElementById("search-input");
-const searchBtn = document.getElementById("search-btn");
 const clearBtn = document.getElementById("clear-btn");
+const resultsEl = document.getElementById("search-results");
 
-searchInput.addEventListener("keypress", (e) => {
-    if (!/[a-zA-Z\s]/.test(e.key)) e.preventDefault();
-});
+let searchIndex = [];
+let currentResults = [];
+let activeIdx = -1;
 
-function searchCountry() {
-    const query = searchInput.value.trim().toLowerCase();
-    if (!query) return;
+const norm = (s) =>
+  s
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase();
 
-    const match = Object.entries(countries).find(([id, name]) =>
-        name.toLowerCase().includes(query),
-    );
-    if (!match) return;
-
-    const [foundId] = match;
-    state.select(foundId);
-
-    const related = extradition[foundId]?.treaties || [];
-
-    group.selectAll(".country").attr("fill", function(p) {
-      const pid = String(p.id);
-      if (pid === foundId) return COLORS.selected;
-      if (related.includes(pid)) return COLORS.related;
-      return COLORS.default;
-    });
-
-    state.renderExtradition(foundId);
-    drawArcs(foundId, related);
-    zoomToCountry(foundId);
+function buildSearchIndex() {
+  searchIndex = [...mapIds]
+    .map((id) => ({ id, name: countryName(id), norm: norm(countryName(id)), iso: iso3(id) }))
+    .sort((a, b) => a.name.localeCompare(b.name));
 }
 
-searchBtn.addEventListener("click", searchCountry);
+function queryCountries(q) {
+  const n = norm(q.trim());
+  if (!n) return [];
+  const starts = [];
+  const includes = [];
+  for (const c of searchIndex) {
+    if (c.norm.startsWith(n) || c.iso.toLowerCase() === n) starts.push(c);
+    else if (c.norm.includes(n)) includes.push(c);
+  }
+  return starts.concat(includes).slice(0, 6);
+}
+
+function highlight(name, q) {
+  const n = norm(q.trim());
+  const frag = document.createDocumentFragment();
+  const normName = norm(name);
+  const i = normName.length === name.length ? normName.indexOf(n) : -1;
+  if (i < 0 || !n) {
+    frag.append(name);
+    return frag;
+  }
+  const mark = document.createElement("mark");
+  mark.textContent = name.slice(i, i + n.length);
+  frag.append(name.slice(0, i), mark, name.slice(i + n.length));
+  return frag;
+}
+
+function showResults(list, q) {
+  currentResults = list;
+  activeIdx = list.length ? 0 : -1;
+  resultsEl.replaceChildren();
+
+  if (list.length === 0) {
+    const li = document.createElement("li");
+    li.className = "search-empty";
+    li.textContent = t("search.noResults");
+    resultsEl.append(li);
+  }
+
+  list.forEach((c, i) => {
+    const li = document.createElement("li");
+    li.className = "search-item";
+    li.id = `search-opt-${i}`;
+    li.setAttribute("role", "option");
+    li.setAttribute("aria-selected", i === activeIdx ? "true" : "false");
+
+    const iso = document.createElement("span");
+    iso.className = "iso";
+    iso.textContent = c.iso;
+
+    const name = document.createElement("span");
+    name.className = "search-item-name";
+    name.append(highlight(c.name, q));
+
+    const count = document.createElement("span");
+    count.className = "search-item-count";
+    const n = document.createElement("b");
+    n.textContent = extradition[c.id]?.treaties?.length ?? "–";
+    const lbl = document.createElement("span");
+    lbl.textContent = t("search.treaties");
+    count.append(n, lbl);
+
+    li.append(iso, name, count);
+    // mousedown, а не click: поле не должно терять фокус до выбора
+    li.addEventListener("mousedown", (e) => {
+      e.preventDefault();
+      chooseCountry(c.id);
+    });
+    resultsEl.append(li);
+  });
+
+  resultsEl.hidden = false;
+  searchInput.setAttribute("aria-expanded", "true");
+  setActive(activeIdx);
+}
+
+function hideResults() {
+  resultsEl.hidden = true;
+  searchInput.setAttribute("aria-expanded", "false");
+  searchInput.removeAttribute("aria-activedescendant");
+  currentResults = [];
+  activeIdx = -1;
+}
+
+function setActive(i) {
+  activeIdx = i;
+  [...resultsEl.querySelectorAll(".search-item")].forEach((li, k) =>
+    li.setAttribute("aria-selected", k === i ? "true" : "false"),
+  );
+  if (i >= 0) searchInput.setAttribute("aria-activedescendant", `search-opt-${i}`);
+}
+
+function chooseCountry(id) {
+  hideResults();
+  searchInput.blur();
+  selectCountry(id, { zoom: true });
+}
+
+searchInput.addEventListener("input", () => {
+  // только латиница, пробел, апостроф, точка и дефис
+  const clean = searchInput.value.replace(/[^a-zA-Z\s'.\-]/g, "");
+  if (clean !== searchInput.value) searchInput.value = clean;
+  clearBtn.hidden = clean === "" && !state.selectedId;
+  if (clean.trim() === "") return hideResults();
+  showResults(queryCountries(clean), clean);
+});
+
+searchInput.addEventListener("focus", () => {
+  if (state.selectedId) searchInput.select();
+});
+
+searchInput.addEventListener("blur", () => {
+  hideResults();
+  // если страна выбрана, а в поле остался недописанный запрос, вернуть её название
+  if (state.selectedId) renderCapsule();
+});
 
 searchInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") searchCountry();
+  if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+    if (!currentResults.length) return;
+    e.preventDefault();
+    const d = e.key === "ArrowDown" ? 1 : -1;
+    setActive((activeIdx + d + currentResults.length) % currentResults.length);
+  } else if (e.key === "Enter") {
+    e.preventDefault();
+    const pick = currentResults[activeIdx] || currentResults[0];
+    if (pick) chooseCountry(pick.id);
+  } else if (e.key === "Escape") {
+    hideResults();
+    searchInput.blur();
+  }
 });
 
 clearBtn.addEventListener("click", () => {
-    searchInput.value = "";
-    state.clear();
-    group.selectAll("path").attr("fill", COLORS.default);
+  searchInput.value = "";
+  hideResults();
+  clearSelection();
+  renderCapsule();
 });

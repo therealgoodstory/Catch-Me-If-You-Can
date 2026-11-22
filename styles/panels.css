@@ -1,110 +1,499 @@
-#country-info,
-#search-bar,
-#search-input,
-#search-btn,
-#clear-btn {
-    pointer-events: all;
+/* ---------- верхняя панель ---------- */
+#topbar {
+  position: fixed;
+  z-index: var(--z-ui);
+  top: calc(var(--s-5) + env(safe-area-inset-top));
+  left: var(--s-4);
+  right: var(--s-4);
+  height: var(--hit);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  pointer-events: none;
 }
 
-#panel-left {
+#topbar > * {
+  pointer-events: auto;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.wordmark {
+  font: 700 12px / 15px var(--font-mono);
+  letter-spacing: 0.14em;
+  color: #e6ebf5;
+}
+
+.btn-play {
+  height: var(--hit);
+  padding: 0 20px 0 16px;
+  font-size: var(--fs-md);
+}
+
+.btn-play .icon {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+  stroke: none;
+}
+
+/* ---------- поиск ---------- */
+#search-wrap {
   position: fixed;
-  top: 20px;
-  left: 20px;
-  width: 300px;
-  z-index: 10;
+  z-index: var(--z-ui);
+  top: calc(76px + env(safe-area-inset-top));
+  left: var(--s-4);
+  right: var(--s-4);
   pointer-events: none;
+}
+
+#search-wrap > * {
+  pointer-events: auto;
+}
+
+/* ---------- легенда и зум ---------- */
+#legend {
+  position: fixed;
+  z-index: var(--z-ui);
+  left: var(--s-4);
+  bottom: calc(var(--sheet-h) + 12px);
+  height: 36px;
+  padding: 0 14px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border-radius: 18px;
+  transition: bottom 0.25s var(--ease);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--c-text-2);
+  white-space: nowrap;
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 5px;
+  background: var(--dot);
+}
+
+.legend-dot.ring {
+  background: transparent;
+  border: 2px solid var(--dot);
+}
+
+.legend-game {
+  display: none;
+}
+
+#zoom-ctl {
+  position: fixed;
+  z-index: var(--z-ui);
+  right: var(--s-4);
+  bottom: calc(var(--sheet-h) + 12px);
+  width: var(--hit);
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  border-radius: 22px;
+  transition: bottom 0.25s var(--ease);
 }
 
-#panel-left > * {
-  pointer-events: all;
-}
-
-#country-hover-name {
-  font-size: 16px;
-  color: #1a1a1a;
-  background: rgba(255,255,255,0.92);
-  padding: 10px 14px;
-  border-radius: 4px;
-}
-
-#country-hover-name.placeholder {
-  color: #aaa;
-}
-
-#panel-right {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  width: 300px;
-  z-index: 10;
-  pointer-events: none;
+#zoom-ctl button {
+  width: 100%;
+  height: 46px;
   display: flex;
-  flex-direction: column;
-  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  color: var(--c-text);
 }
 
-#panel-right > * {
-  pointer-events: all;
+#zoom-ctl .sep {
+  height: 1px;
+  margin: 0 10px;
+  background: var(--divider);
 }
 
-#country-name {
-  font-size: 22px;
-  font-weight: 500;
-  color: #1a1a1a;
-  background: rgba(255,255,255,0.92);
-  padding: 12px 16px;
-  border-radius: 4px;
-}
-
-#country-name.placeholder {
-  color: #aaa;
-  font-weight: 400;
-  font-size: 16px;
-}
-
-#country-extradition {
-  background: rgba(255,255,255,0.92);
-  border-radius: 4px;
-  padding: 8px 0;
-  max-height: 60vh;
+/* ---------- карточка страны (нижняя шторка на телефоне) ---------- */
+#sheet,
+#game-sheet {
+  position: fixed;
+  z-index: var(--z-sheet);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-height: 72dvh;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  padding: 10px var(--s-5) calc(var(--s-5) + env(safe-area-inset-bottom));
+  border-radius: var(--r-xl) var(--r-xl) 0 0;
+  border-bottom: 0;
 }
 
-.extradition-item {
-  font-size: 13px;
-  color: #1a1a1a;
-  padding: 8px 16px;
-  border-bottom: 0.5px solid #eee;
+#sheet.is-empty #sheet-body,
+#sheet:not(.is-empty) #sheet-empty {
+  display: none;
 }
 
-@media (max-width: 768px) {
-  #country-hover-name {
+#sheet-empty {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-bottom: 4px;
+}
+
+.sheet-empty-title {
+  font-size: var(--fs-lg);
+  font-weight: 700;
+}
+
+.sheet-empty-hint {
+  font-size: var(--fs-sm);
+  color: var(--c-text-3);
+}
+
+#sheet-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+
+#country-name,
+#game-country {
+  font-size: var(--fs-title);
+  line-height: 36px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  overflow-wrap: anywhere;
+}
+
+.sheet-head {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sheet-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 34px;
+}
+
+#panel-toggle {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: var(--hit);
+  padding-left: var(--s-3);
+  color: var(--c-treaty);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+#panel-toggle .icon {
+  width: 18px;
+  height: 18px;
+}
+
+/* чипсы партнёров */
+.chips {
+  display: flex;
+  gap: var(--s-2);
+  overflow-x: auto;
+  margin: 0 calc(var(--s-5) * -1);
+  padding: 0 var(--s-5);
+  scrollbar-width: none;
+}
+
+.chips::-webkit-scrollbar {
+  display: none;
+}
+
+#sheet.expanded .chips {
+  flex-wrap: wrap;
+  overflow-x: visible;
+}
+
+.chip {
+  flex: none;
+  height: var(--hit);
+  padding: 0 16px 0 12px;
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  border-radius: 22px;
+  background: rgba(255, 178, 36, 0.12);
+  border: 1px solid rgba(255, 178, 36, 0.4);
+  color: var(--c-treaty-soft);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.chip:disabled {
+  opacity: 0.55;
+}
+
+.chip-iso {
+  font: 700 11px / 1 var(--font-mono);
+  letter-spacing: 0.06em;
+  opacity: 0.85;
+}
+
+#country-source {
+  font-size: var(--fs-sm);
+  font-weight: 600;
+}
+
+/* ---------- игра ---------- */
+#game-hud,
+#game-prompt,
+#game-sheet {
+  display: none;
+}
+
+#game-hud {
+  position: fixed;
+  z-index: var(--z-ui);
+  top: calc(var(--s-5) + env(safe-area-inset-top));
+  left: var(--s-4);
+  right: var(--s-4);
+  height: 58px;
+  align-items: center;
+  padding: 0 7px;
+  border-radius: 29px;
+}
+
+#game-exit {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--c-text);
+}
+
+#game-hud .spacer {
+  flex: 1;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  padding: 0 14px;
+}
+
+.stat-val {
+  font: 700 22px / 22px var(--font-mono);
+}
+
+.stat-val.safe {
+  color: var(--c-safe);
+}
+
+.stat-sep {
+  width: 1px;
+  height: 30px;
+  background: var(--divider);
+}
+
+#game-prompt {
+  position: fixed;
+  z-index: var(--z-ui);
+  top: calc(90px + env(safe-area-inset-top));
+  left: var(--s-4);
+  max-width: calc(100% - 32px);
+  min-height: 40px;
+  padding: 8px 16px 8px 12px;
+  align-items: center;
+  gap: 10px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.prompt-dot {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 5px;
+  border: 2px solid var(--c-treaty);
+}
+
+#game-prompt.is-confirm .prompt-dot {
+  border-color: var(--c-safe);
+  background: var(--c-safe);
+}
+
+/* название страны под курсором (десктоп) или после первого касания (телефон) */
+#game-hover {
+  position: fixed;
+  z-index: var(--z-ui);
+  top: calc(138px + env(safe-area-inset-top));
+  left: var(--s-4);
+  max-width: calc(100% - 32px);
+  display: none;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px 8px 8px;
+  border-radius: 20px;
+  font-size: 15px;
+  font-weight: 600;
+  pointer-events: none;
+}
+
+.in-game #game-hover:not([hidden]) {
+  display: flex;
+}
+
+#game-hover-tap {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--c-safe);
+}
+
+@media (hover: hover) {
+  #game-hover-tap {
     display: none;
   }
-  #panel-left {
-    width: calc(100% - 40px);
+}
+
+#game-sheet {
+  flex-direction: column;
+}
+
+.route {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.route::-webkit-scrollbar {
+  display: none;
+}
+
+.route-chip {
+  flex: none;
+  height: 36px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  border-radius: 18px;
+  font: 700 13px / 1 var(--font-mono);
+  letter-spacing: 0.06em;
+  background: rgba(61, 245, 201, 0.12);
+  border: 1px solid rgba(61, 245, 201, 0.4);
+  color: var(--c-safe);
+}
+
+.route-chip.is-current {
+  background: var(--c-selected);
+  border-color: var(--c-selected);
+  color: var(--c-selected-ink);
+}
+
+.route .icon {
+  width: 16px;
+  height: 16px;
+  color: var(--c-text-3);
+}
+
+.hint {
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--c-text-3);
+}
+
+/* режимы страницы */
+.in-game #topbar,
+.in-game #search-wrap,
+.in-game #sheet,
+.in-game .legend-explore {
+  display: none;
+}
+
+.in-game #game-hud,
+.in-game #game-prompt,
+.in-game #game-sheet {
+  display: flex;
+}
+
+.in-game .legend-game {
+  display: flex;
+}
+
+.show-result #topbar,
+.show-result #search-wrap,
+.show-result #sheet,
+.show-result #legend,
+.show-result #zoom-ctl,
+.show-result #game-hud,
+.show-result #game-prompt,
+.show-result #game-sheet {
+  display: none;
+}
+
+/* ---------- десктоп ---------- */
+@media (min-width: 769px) {
+  #topbar,
+  #search-wrap,
+  #game-hud {
+    left: var(--s-5);
+    right: auto;
+    width: var(--panel-w);
   }
-  #search-bar {
-    width: 100%;
+
+  #game-prompt,
+  #game-hover {
+    left: var(--s-5);
   }
-  #panel-right {
-    top: auto;
-    bottom: 20px;
-    left: 20px;
-    right: 20px;
-    width: auto;
-    display: flex;
-    flex-direction: column-reverse;
+
+  #sheet,
+  #game-sheet {
+    top: var(--s-5);
+    right: var(--s-5);
+    left: auto;
+    bottom: auto;
+    width: var(--sheet-w);
+    max-height: calc(100dvh - 40px);
+    border-radius: var(--r-xl);
+    border-bottom: 1px solid var(--glass-border);
+    padding-bottom: var(--s-5);
   }
-  #country-extradition,
-  #country-source {
+
+  .sheet-handle,
+  #panel-toggle {
     display: none;
   }
-  #panel-right.expanded #country-extradition,
-  #panel-right.expanded #country-source {
-    display: block;
+
+  .chips,
+  #sheet.expanded .chips {
+    flex-wrap: wrap;
+    overflow-x: visible;
+    margin: 0;
+    padding: 0;
+  }
+
+  #legend {
+    left: var(--s-5);
+    bottom: var(--s-5);
+  }
+
+  #zoom-ctl {
+    left: var(--s-5);
+    right: auto;
+    bottom: 76px;
   }
 }
