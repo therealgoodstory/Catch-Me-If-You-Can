@@ -1,9 +1,7 @@
-// Якоря стран, дуги и маркеры. Стили в styles/map.css (.arc, .trail, .marker-*).
-
-let featureMap = new Map(); // id -> feature, заполняется в main.js
+let featureMap = new Map();
 const polyCache = new Map();
 
-// Самый большой полигон страны: Франция без Гвианы, США без Аляски и т.д.
+// Largest polygon of a country, so e.g. France excludes Guiana and the US excludes Alaska
 function largestPolygonFeature(id) {
   if (polyCache.has(id)) return polyCache.get(id);
   const f = featureMap.get(id);
@@ -51,7 +49,7 @@ function currentZoomK() {
   return svg ? d3.zoomTransform(svg.node()).k : 1;
 }
 
-// Радиус хранится в data-r и делится на масштаб карты, чтобы точки не росли при зуме
+// The radius is stored in data-r and divided by the zoom factor, so markers keep a constant screen size
 function addDot(cls, p, r) {
   return overlay
     .append("circle")
@@ -75,16 +73,14 @@ function clearArcs() {
   if (overlay) overlay.selectAll("*").remove();
 }
 
-// Линия и её свечение: свечение это второй, широкий и полупрозрачный штрих.
-// Один path на все дуги вместо path на дугу, и никаких filter: drop-shadow
-// (фильтр на каждом элементе заставляет браузер перерисовывать растр на каждый кадр зума).
+// Draws a line plus its glow (a second, wider, translucent stroke). All arcs share one path,
+// and drop-shadow is avoided because it forces a repaint on every zoom frame.
 function addLine(cls, glowCls, d) {
   if (!d) return;
   if (glowCls) overlay.append("path").attr("class", glowCls).attr("d", d);
   overlay.append("path").attr("class", cls).attr("d", d);
 }
 
-// Режим исследования: дуги от выбранной страны к партнёрам
 function drawArcs(fromId, toIds) {
   clearArcs();
   const a = screenAnchor(fromId);
@@ -104,8 +100,8 @@ function drawArcs(fromId, toIds) {
   addDot("marker-origin", a, 4.5);
 }
 
-// Игра: пунктирный маршрут по посещённым странам.
-// fatalId: страна, где поймали (янтарная дуга к ней от последней безопасной)
+// Draws the dotted route through the visited countries.
+// fatalId: country where the player was caught, joined by an amber arc from the last safe country.
 function drawTrail(ids, fatalId = null) {
   clearArcs();
   const pts = ids.map(screenAnchor);

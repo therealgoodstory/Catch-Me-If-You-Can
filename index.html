@@ -23,12 +23,11 @@
     <link rel="stylesheet" href="styles/panels.css" />
     <link rel="stylesheet" href="styles/mobile.css" />
     <link rel="stylesheet" href="styles/modal.css" />
+    <link rel="stylesheet" href="styles/about.css" />
   </head>
   <body>
-    <!--map-->
     <div id="map"></div>
 
-    <!--top bar: brand + play-->
     <header id="topbar">
       <div class="brand">
         <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true">
@@ -37,6 +36,12 @@
           <path d="M15 1v6M15 23v6M1 15h6M23 15h6" stroke="#3df5c9" stroke-width="2" stroke-linecap="round" />
         </svg>
         <h1 class="wordmark">CATCH ME<br />IF YOU CAN</h1>
+        <button id="about-btn" class="icon-btn about-btn" type="button" data-i18n-attr="aria-label:about.open">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="9" />
+            <path d="M12 11v5.5M12 7.8v.01" />
+          </svg>
+        </button>
       </div>
       <button id="game-toggle" class="btn-primary btn-play" type="button">
         <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5l11 6.5-11 6.5z" /></svg>
@@ -44,7 +49,6 @@
       </button>
     </header>
 
-    <!--search + selected country (one capsule)-->
     <div id="search-wrap">
       <div id="search-capsule" class="glass">
         <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="M20 20l-3.5-3.5" /></svg>
@@ -72,7 +76,6 @@
       <div id="country-hover-name" class="glass placeholder"></div>
     </div>
 
-    <!--legend + zoom-->
     <div id="legend" class="glass">
       <span class="legend-item legend-explore" style="--dot: var(--c-selected)"><span class="legend-dot"></span><span data-i18n="legend.selected">Selected</span></span>
       <span class="legend-item legend-explore" style="--dot: var(--c-treaty)"><span class="legend-dot ring"></span><span data-i18n="legend.treaty">Treaty</span></span>
@@ -91,7 +94,6 @@
       </button>
     </div>
 
-    <!--country card (bottom sheet on phones)-->
     <section id="sheet" class="glass is-empty" aria-label="Country details">
       <div class="sheet-handle" aria-hidden="true"></div>
       <div id="sheet-empty">
@@ -119,7 +121,6 @@
       </div>
     </section>
 
-    <!--game: hud, prompt, route sheet-->
     <header id="game-hud" class="glass">
       <button id="game-exit" class="icon-btn" type="button" data-i18n-attr="aria-label:game.exit" aria-label="Exit game">
         <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
@@ -155,7 +156,6 @@
       <p id="game-hint" class="hint"></p>
     </section>
 
-    <!--game result-->
     <div id="result" hidden role="dialog" aria-modal="true" aria-labelledby="result-count-label">
       <div class="result-scrim"></div>
       <header class="result-head">
@@ -231,7 +231,31 @@
       </div>
     </div>
 
-    <!--CDN-->
+    <div id="about" role="dialog" aria-modal="true" aria-labelledby="about-title" hidden>
+      <div id="about-scrim"></div>
+      <div id="about-card" class="glass">
+        <h2 id="about-title" data-i18n="about.title"></h2>
+        <section>
+          <h3 data-i18n="about.mapTitle"></h3>
+          <p data-i18n="about.mapText"></p>
+        </section>
+        <section>
+          <h3 data-i18n="about.gameTitle"></h3>
+          <p data-i18n="about.gameText"></p>
+        </section>
+        <section>
+          <h3 data-i18n="about.dataTitle"></h3>
+          <p data-i18n="about.data"></p>
+          <p class="muted" data-i18n="about.legal"></p>
+        </section>
+        <div class="about-links">
+          <a id="link-github" class="btn-ghost" target="_blank" rel="noopener noreferrer" hidden data-i18n="about.github"></a>
+          <a id="link-coffee" class="btn-ghost" target="_blank" rel="noopener noreferrer" hidden data-i18n="about.coffee"></a>
+        </div>
+        <button id="about-close" class="btn-ghost" type="button" data-i18n="about.close"></button>
+      </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
     <script src="https://cdn.jsdelivr.net/npm/topojson@3"></script>
 
@@ -247,6 +271,7 @@
     <script src="src/search_input.js"></script>
     <script src="src/game.js"></script>
     <script src="src/result.js"></script>
+    <script src="src/about.js"></script>
     <!-- main.js is last: it starts the app -->
     <script src="src/main.js"></script>
   </body>

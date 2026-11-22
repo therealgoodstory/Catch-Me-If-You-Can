@@ -1,15 +1,12 @@
-// Игровой режим: перелетай между странами и избегай тех, у кого есть договор
-// об экстрадиции с текущей. Экран итогов живёт в src/result.js.
-
 const game = {
   active: false,
   resultShown: false,
   won: false,
   visited: [],
   currentTarget: null,
-  caughtId: null, // страна, куда прыгнул игрок и где его поймали
-  finalId: null, // подсвечиваемая на итогах страна (поймали / последняя безопасная)
-  pending: null, // тач: первая страна из двух касаний
+  caughtId: null, // country the player jumped into and was caught in
+  finalId: null, // country highlighted on the result screen (caught country, or the last safe one on a win)
+  pending: null, // touch: country picked by the first of the two taps
 
   start() {
     const ids = Object.keys(extradition).filter((id) => mapIds.has(id));
@@ -33,7 +30,7 @@ const game = {
     observeSheetHeight();
   },
 
-  // сколько безопасных ходов осталось
+  // Number of safe moves left: not visited and no treaty with the current country
   safeMoves() {
     const related = new Set(extradition[this.currentTarget]?.treaties || []);
     const seen = new Set(this.visited);
@@ -50,7 +47,7 @@ const game = {
     if (!this.active) return;
     if (!mapIds.has(id)) return;
 
-    // на тач-экране первое касание показывает название, второе совершает прыжок
+    // On touch screens the first tap shows the name, the second tap makes the jump
     if (isTouch()) {
       if (this.visited.includes(id)) {
         this.pending = null;
@@ -140,7 +137,7 @@ const game = {
     setHoverName(null);
     showGameHover(null);
 
-    // вся карта целиком, маршрут поверх
+    // Reset to the whole map so layoutResultMap() can fit it into the result slot
     svg.call(zoom.transform, d3.zoomIdentity);
     paintMap();
     drawTrail(this.visited, caughtId);
@@ -168,7 +165,7 @@ const game = {
   },
 };
 
-// Плашка с названием страны в игре. withTap: подсказка «коснись ещё раз» (тач)
+// Name pill shown during the game. withTap adds the "tap again" hint (touch)
 function showGameHover(id, withTap = false) {
   const el = document.getElementById("game-hover");
   if (!id) {

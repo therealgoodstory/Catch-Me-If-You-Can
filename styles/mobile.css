@@ -1,5 +1,3 @@
-/* Мелкие подстройки под узкие экраны.
-   Основная адаптация живёт в panels.css (блок для десктопа) и modal.css. */
 @media (max-width: 380px) {
   :root {
     --fs-title: 28px;
@@ -17,8 +15,8 @@
   }
 }
 
-/* Размытие фона под панелями на телефоне очень дорогое: карта под ними
-   перерисовывается на каждый кадр зума. Вместо него более плотная заливка. */
+/* backdrop-filter is expensive on phones because the map underneath repaints on every zoom frame,
+   so panels use a denser fill instead. */
 @media (max-width: 768px), (hover: none) {
   :root {
     --glass-bg: rgba(13, 18, 29, 0.93);

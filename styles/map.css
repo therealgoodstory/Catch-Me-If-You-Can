@@ -19,7 +19,6 @@
   transition: transform 0.6s var(--ease);
 }
 
-/* суша */
 .country,
 .land {
   stroke-linejoin: round;
@@ -48,7 +47,7 @@
   pointer-events: none;
 }
 
-/* состояния страны (классы ставит paintMap) */
+/* State classes are toggled by paintMap() */
 .country.is-hover {
   fill: var(--c-land-hover);
 }
@@ -80,14 +79,13 @@
   stroke-width: 1.2px;
 }
 
-/* где поймали: янтарный, цвет договора */
 .country.is-caught {
   fill: var(--c-treaty);
   stroke: var(--c-treaty-soft);
   stroke-width: 1.2px;
 }
 
-/* свечение линий: второй широкий полупрозрачный штрих вместо drop-shadow */
+/* Glow is a second, wider, translucent stroke: drop-shadow filters are costly to repaint on every zoom frame */
 .arc-glow,
 .trail-glow {
   fill: none;
@@ -102,7 +100,6 @@
   stroke: var(--c-safe);
 }
 
-/* дуги и маркеры */
 .overlay {
   pointer-events: none;
 }

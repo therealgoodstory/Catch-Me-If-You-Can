@@ -1,5 +1,3 @@
-// Экран итогов: число пройденных стран, где поймали, ранг, статистика, шеринг
-
 function rankInfo(n) {
   let i = 0;
   RANKS.forEach((r, k) => {
@@ -27,7 +25,7 @@ function saveBest(n) {
   try {
     localStorage.setItem(STORAGE_BEST, String(n));
   } catch {
-    /* приватный режим: рекорд просто не сохранится */
+    /* storage unavailable (private mode): the best score is just not persisted */
   }
 }
 
@@ -45,7 +43,7 @@ function fmtKm(km) {
   return km >= 1000 ? `${(km / 1000).toFixed(1)}k` : String(Math.round(km));
 }
 
-// Контур страны для карточки «Caught in»
+// Fits the country outline into the 50x50 viewBox of the "Caught in" card
 function setSilhouette(id) {
   const f = largestPolygonFeature(id);
   const el = document.getElementById("caught-path");
@@ -71,7 +69,7 @@ function countUp(el, to, ms = 700) {
   requestAnimationFrame(tick);
 }
 
-// Вписывает всю карту в окно #result-map-slot (CSS-трансформом svg)
+// Fits the whole map into #result-map-slot by scaling the svg element with a CSS transform
 function layoutResultMap() {
   const slot = document.getElementById("result-map-slot").getBoundingClientRect();
   const b = path.bounds({ type: "FeatureCollection", features: worldCountries.features });
@@ -97,7 +95,6 @@ function showResult(g) {
   document.getElementById("result-count-label").textContent = t("result.crossed", { n });
   countUp(document.getElementById("result-count"), n);
 
-  // где поймали
   const caught = document.getElementById("result-caught");
   caught.classList.toggle("is-win", g.won);
   document.getElementById("caught-eyebrow").textContent = g.won
@@ -109,7 +106,6 @@ function showResult(g) {
     : t("result.extraditedTo", { country: countryName(g.currentTarget) });
   setSilhouette(g.finalId);
 
-  // ранг
   const r = rankInfo(n);
   document.getElementById("rank-name").textContent = t(`rank.${r.cur.key}`);
   document.getElementById("rank-next").textContent = r.next
@@ -121,7 +117,6 @@ function showResult(g) {
   fill.style.width = "0";
   requestAnimationFrame(() => requestAnimationFrame(() => (fill.style.width = `${pct}%`)));
 
-  // статистика
   document.getElementById("res-world").textContent = `${Math.round((n / mapIds.size) * 100)}%`;
   const route = g.caughtId ? [...g.visited, g.caughtId] : g.visited;
   document.getElementById("res-km").textContent = fmtKm(distanceKm(route));
@@ -132,7 +127,7 @@ function showResult(g) {
   document.getElementById("res-best").textContent = String(best);
   document.getElementById("res-new").hidden = !(n > prevBest);
 
-  // карта в окно между числом и карточкой
+  // Wait a frame so the slot has its final size before fitting the map
   requestAnimationFrame(() => {
     layoutResultMap();
     document.getElementById("result-restart").focus({ preventScroll: true });
@@ -160,7 +155,7 @@ async function shareResult() {
       setTimeout(() => (label.textContent = t("result.share")), 1600);
     }
   } catch {
-    /* пользователь закрыл окно шеринга */
+    /* share sheet dismissed by the user */
   }
 }
 

@@ -1,5 +1,3 @@
-// Камера: приблизить страну и вернуться к стартовому виду
-
 function zoomToCountry(id) {
   const f = largestPolygonFeature(id);
   if (!f || !svg) return;
@@ -12,7 +10,7 @@ function zoomToCountry(id) {
   const cx = (x0 + x1) / 2;
   const cy = (y0 + y1) / 2;
 
-  // на телефоне низ экрана закрывает шторка, поэтому центр выше
+  // On phones the bottom sheet covers the lower part, so the target center is raised
   const targetY = mobile ? h * 0.36 : h / 2;
   const maxK = mobile ? 3 : 2.5;
   const fit = 0.5 / Math.max((x1 - x0) / w, (y1 - y0) / (mobile ? h * 0.4 : h));

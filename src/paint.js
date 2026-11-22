@@ -1,5 +1,4 @@
-// Единственное место, где решается, как раскрашена карта.
-// Цвета задаются классами в styles/map.css, а не в JS.
+// Single place that decides how the map is colored. Colors come from the state classes in styles/map.css.
 function paintMap(hoverId = null) {
   if (!group) return;
 
@@ -25,8 +24,8 @@ function paintMap(hoverId = null) {
     c.toggle("is-hover", hoverId !== null && id === hoverId);
   });
 
-  // Подсвеченные страны поднимаем над соседями, иначе их обводку перекрывают чужие заливки.
-  // Порядок меняем только когда набор подсвеченных изменился (не на каждый hover).
+  // Highlighted countries are raised above their neighbors, otherwise neighbors' fills cover their outline.
+  // DOM order is only changed when the set of highlighted countries changes (not on every hover).
   const key = [sel, current, game.finalId, inGame, [...related, ...visited].join()].join("|");
   if (key !== paintMap.lastKey) {
     paintMap.lastKey = key;

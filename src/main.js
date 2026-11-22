@@ -1,9 +1,6 @@
-// Точка входа: карта, проекция, зум, обработчики наведения и кликов.
-// Грузится последним в index.html.
-
 let extradition = {};
 let worldCountries;
-let mapIds = new Set(); // id стран, которые есть и на карте, и в data/countries.js
+let mapIds = new Set(); // ids present both on the map and in data/countries.js
 let svg;
 let group;
 let overlay;
@@ -18,19 +15,18 @@ function layoutSize() {
   return { w: window.innerWidth, h: window.innerHeight };
 }
 
-// Единственное место, где считается проекция
 function applyProjection() {
   const { w, h } = layoutSize();
   const mobile = isMobile();
   const scale = mobile ? Math.min(w / 5.6, h / 3.6) : Math.min(w / 6.3, h / 3.2);
-  // на телефоне низ закрыт шторкой, карта смещена вверх
+  // On phones the bottom sheet covers the lower part, so the map is shifted up
   const cy = mobile ? h * 0.4 : h / 2 + 20;
   projection = d3.geoNaturalEarth1().scale(scale).translate([w / 2, cy]);
-  path = d3.geoPath(projection).digits(1); // 1 знак после запятой: путь короче в ~2 раза, парсить и рисовать легче
+  path = d3.geoPath(projection).digits(1); // digits(1) roughly halves the amount of path data
 }
 
-// Стартовый вид. На телефоне карта приближена и центрирована на Европу/Африку
-// (там большинство договоров), в полосе между капсулой и шторкой.
+// Start view. On phones the map is zoomed in and centered on Europe/Africa (where most treaties are),
+// within the band between the search capsule and the bottom sheet.
 function initialTransform(k = 2) {
   if (!isMobile()) return d3.zoomIdentity;
   const { w, h } = layoutSize();
@@ -53,7 +49,7 @@ function redrawGeometry() {
   if (game.resultShown) layoutResultMap();
 }
 
-// Сетка растворяется к верху и низу карты: градиент по Y в координатах группы
+// Fades the graticule toward the top and bottom with a vertical gradient in group coordinates
 function updateGraticule() {
   const g = d3.geoGraticule10();
   group.select(".graticule").attr("d", path(g));
@@ -79,7 +75,6 @@ function bindCountryEvents(sel) {
     .on("click", (event, d) => {
       if (game.resultShown) return;
       if (game.active) return game.handleClick(d.id);
-      // на тач-экране первое касание только выбирает страну, повторное тоже
       selectCountry(d.id, { zoom: true });
     });
 }
@@ -95,10 +90,10 @@ async function init() {
 
   worldCountries = topojson.feature(world, world.objects.countries);
   worldCountries.features.forEach((f) => {
-    // у части фич (Косово, Сев. Кипр) нет id; такие рисуем как неинтерактивную сушу
+    // Some features (Kosovo, Northern Cyprus) have no id; they are drawn as non-interactive land
     f.id = f.id == null ? null : String(parseInt(f.id, 10));
   });
-  // Антарктида ломает проекцию и игру (нет договоров), убираем
+  // Antarctica is dropped: it has no treaty data and would count as a playable country in the game
   worldCountries.features = worldCountries.features.filter((f) => f.id !== "10");
 
   const interactive = worldCountries.features.filter((f) => f.id && countries[f.id]);
@@ -172,10 +167,10 @@ async function init() {
   observeSheetHeight();
   svg.call(zoom.transform, initialTransform());
 
-  // клик по пустому месту карты снимает выбор
+  // A click on empty map clears the selection
   svg.on("click", (event) => {
     if (event.target.closest(".country") || game.resultShown) return;
-    // в игре касание пустого места отменяет выбранную (первое касание)
+    // During the game an empty tap cancels the pending first tap
     if (game.active) {
       if (game.pending) {
         game.pending = null;

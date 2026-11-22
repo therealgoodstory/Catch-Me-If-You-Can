@@ -1,4 +1,4 @@
-// Капсула поиска: поиск только по латинице (английские названия и ISO-коды)
+// Matches Latin input only, against English country names and ISO alpha-3 codes (diacritics stripped).
 
 const searchInput = document.getElementById("search-input");
 const clearBtn = document.getElementById("clear-btn");
@@ -83,7 +83,7 @@ function showResults(list, q) {
     count.append(n, lbl);
 
     li.append(iso, name, count);
-    // mousedown, а не click: поле не должно терять фокус до выбора
+    // mousedown instead of click, so the input keeps focus until a choice is made
     li.addEventListener("mousedown", (e) => {
       e.preventDefault();
       chooseCountry(c.id);
@@ -119,7 +119,7 @@ function chooseCountry(id) {
 }
 
 searchInput.addEventListener("input", () => {
-  // только латиница, пробел, апостроф, точка и дефис
+  // Strip everything except Latin letters, whitespace, apostrophe, dot and hyphen
   const clean = searchInput.value.replace(/[^a-zA-Z\s'.\-]/g, "");
   if (clean !== searchInput.value) searchInput.value = clean;
   clearBtn.hidden = clean === "" && !state.selectedId;
@@ -133,7 +133,7 @@ searchInput.addEventListener("focus", () => {
 
 searchInput.addEventListener("blur", () => {
   hideResults();
-  // если страна выбрана, а в поле остался недописанный запрос, вернуть её название
+  // Restore the selected country's name if a half-typed query was left in the input
   if (state.selectedId) renderCapsule();
 });
 

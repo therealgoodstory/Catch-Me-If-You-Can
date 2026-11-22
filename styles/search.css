@@ -1,11 +1,10 @@
-/* Капсула: поиск и выбранная страна в одном элементе */
 #search-capsule {
   height: 54px;
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 0 6px 0 18px;
-  border-radius: 27px;
+  border-radius: var(--radius);
 }
 
 #search-capsule .icon {
@@ -37,12 +36,11 @@
   color: var(--c-selected-soft);
 }
 
-/* список результатов */
 #search-results {
   list-style: none;
   margin-top: var(--s-2);
   padding: 6px 0;
-  border-radius: var(--r-lg);
+  border-radius: var(--radius);
   max-height: 60dvh;
   overflow-y: auto;
 }
@@ -101,13 +99,12 @@
   font-size: var(--fs-sm);
 }
 
-/* название страны под курсором (только десктоп) */
 #country-hover-name {
   display: none;
   align-self: flex-start;
   margin-top: var(--s-2);
   padding: 10px 14px;
-  border-radius: var(--r-md);
+  border-radius: var(--radius);
   font-size: var(--fs-md);
   font-weight: 600;
 }

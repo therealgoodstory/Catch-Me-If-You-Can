@@ -1,5 +1,3 @@
-// Выбранная страна: состояние, карточка (шторка) и капсула поиска
-
 const state = {
   selectedId: null,
 
@@ -16,7 +14,7 @@ const state = {
   },
 };
 
-// Выбор страны: карточка, дуги, раскраска, по желанию камера
+// Selects a country: updates the card, arcs and colors, and optionally zooms the camera
 function selectCountry(id, { zoom: doZoom = false } = {}) {
   if (!countries[id] || !mapIds.has(id)) return;
   state.select(id);
@@ -32,14 +30,12 @@ function clearSelection({ resetZoom = true } = {}) {
   if (resetZoom) resetView();
 }
 
-// ---------- название под курсором ----------
 function setHoverName(id) {
   const el = document.getElementById("country-hover-name");
   el.textContent = id ? countryName(id) : t("hover.placeholder");
   el.classList.toggle("placeholder", !id);
 }
 
-// ---------- карточка страны ----------
 function renderSheet() {
   const sheet = document.getElementById("sheet");
   const id = state.selectedId;
@@ -81,8 +77,16 @@ function renderSheet() {
         code.className = "chip-iso";
         code.textContent = iso3(rid);
         b.append(code, countryName(rid));
-        if (mapIds.has(rid)) b.addEventListener("click", () => selectCountry(rid, { zoom: true }));
-        else b.disabled = true;
+        if (mapIds.has(rid)) {
+          b.addEventListener("click", () => selectCountry(rid, { zoom: true }));
+          // Hovering or focusing a chip highlights that country on the map
+          const on = () => paintMap(rid);
+          const off = () => paintMap();
+          b.addEventListener("mouseenter", on);
+          b.addEventListener("mouseleave", off);
+          b.addEventListener("focus", on);
+          b.addEventListener("blur", off);
+        } else b.disabled = true;
         box.append(b);
       });
   }
@@ -116,7 +120,6 @@ document.getElementById("panel-toggle").addEventListener("click", () => {
   observeSheetHeight();
 });
 
-// ---------- капсула: поиск и выбранная страна ----------
 function renderCapsule() {
   const id = state.selectedId;
   const input = document.getElementById("search-input");
@@ -133,7 +136,7 @@ function renderCapsule() {
   }
 }
 
-// ---------- высота шторки -> отступ легенды и зума (--sheet-h) ----------
+// --sheet-h lifts the legend and zoom controls above the visible bottom sheet (phones only)
 let sheetObserver = null;
 
 function syncSheetHeight() {
@@ -152,6 +155,6 @@ function observeSheetHeight() {
     sheetObserver.observe(document.getElementById("game-sheet"));
     window.addEventListener("resize", syncSheetHeight);
   }
-  // пересчёт при смене режима (игра / исследование), когда размер шторки мог не измениться
+  // Recompute on mode switches, when the sheet's size may not have changed
   requestAnimationFrame(syncSheetHeight);
 }

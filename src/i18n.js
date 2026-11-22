@@ -1,5 +1,5 @@
-// Минимальный i18n-каркас. Языки добавляются как новые объекты в I18N.
-// Не склеивай строки в коде: используй {параметры}, порядок слов в языках разный.
+// Minimal i18n. Languages are added as new objects in I18N.
+// Strings use {params} and CLDR plural keys (one/other/...) instead of concatenation.
 const I18N = {
   en: {
     "play": "Play",
@@ -60,6 +60,22 @@ const I18N = {
     "rank.runner": "Runner",
     "rank.phantom": "Phantom",
     "rank.legend": "Legend",
+
+    "about.open": "About and data notice",
+    "about.title": "About",
+    "about.mapTitle": "The map",
+    "about.mapText":
+      "Shows which countries have an extradition treaty with each other. Pick a country and arcs connect it to every country it has a treaty with.",
+    "about.gameTitle": "The game",
+    "about.gameText":
+      "You start in a random country. Jump to any country that has no treaty with the one you are in. Jump to one that does and you are caught. Each safe jump changes where you are, and you cannot return to a country you have visited. The longer your route, the better.",
+    "about.dataTitle": "About the data",
+    "about.data":
+      "Made by one person. The treaty data was researched with the help of an LLM, so it may be incomplete or out of date: please verify anything important against official sources.",
+    "about.legal": "For information and entertainment only, not legal advice.",
+    "about.github": "GitHub",
+    "about.coffee": "Buy me a coffee",
+    "about.close": "Close",
   },
 };
 
@@ -74,15 +90,14 @@ function t(key, params = {}) {
   return v.replace(/\{(\w+)\}/g, (_, k) => (params[k] ?? `{${k}}`));
 }
 
-// Названия стран: сейчас английские из data/countries.js.
-// Позже здесь подключается Intl.DisplayNames по ISO alpha-2 (см. iso2()).
+// Country name by numeric id (English names from data/countries.js).
 function countryName(id) {
   return countries[id] || String(id);
 }
 
-// Применяет переводы к разметке:
-//   data-i18n="key"                         -> textContent
-//   data-i18n-attr="placeholder:key;aria-label:key2" -> атрибуты
+// Applies translations to the markup:
+//   data-i18n="key"                                  -> textContent
+//   data-i18n-attr="placeholder:key;aria-label:key2" -> attributes
 function applyI18n(root = document) {
   root.querySelectorAll("[data-i18n]").forEach((el) => {
     el.textContent = t(el.dataset.i18n);
