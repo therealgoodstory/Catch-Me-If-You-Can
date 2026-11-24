@@ -43,16 +43,28 @@ function fmtKm(km) {
   return km >= 1000 ? `${(km / 1000).toFixed(1)}k` : String(Math.round(km));
 }
 
-// Fits the country outline into the 50x50 viewBox of the "Caught in" card
-function setSilhouette(id) {
-  const f = largestPolygonFeature(id);
-  const el = document.getElementById("caught-path");
-  if (!f) {
-    el.setAttribute("d", "");
+// Square flag of the final country (flag-icons, 1x1 variant)
+function setFlag(id) {
+  const code = iso2(id);
+  document.getElementById("caught-flag").className = code ? `fi fi-${code.toLowerCase()}` : "fi";
+}
+
+// "Extradited to [flag] Country": the country is a small plaque with its flag
+function setSub(g) {
+  const sub = document.getElementById("caught-sub");
+  sub.replaceChildren();
+  if (g.won) {
+    sub.textContent = t("result.win");
     return;
   }
-  const p = d3.geoPath(d3.geoNaturalEarth1().fitSize([50, 50], f)).digits(1);
-  el.setAttribute("d", p(f));
+  const [before, after = ""] = t("result.extraditedTo", { country: "\u0000" }).split("\u0000");
+  const pill = document.createElement("span");
+  pill.className = "caught-pill";
+  const flag = document.createElement("span");
+  const code = iso2(g.currentTarget);
+  flag.className = code ? `fi fi-${code.toLowerCase()}` : "fi";
+  pill.append(flag, countryName(g.currentTarget));
+  sub.append(before, pill, after);
 }
 
 function countUp(el, to, ms = 700) {
@@ -69,24 +81,6 @@ function countUp(el, to, ms = 700) {
   requestAnimationFrame(tick);
 }
 
-// Fits the whole map into #result-map-slot by scaling the svg element with a CSS transform
-function layoutResultMap() {
-  const slot = document.getElementById("result-map-slot").getBoundingClientRect();
-  const b = path.bounds({ type: "FeatureCollection", features: worldCountries.features });
-  const bw = b[1][0] - b[0][0];
-  const bh = b[1][1] - b[0][1];
-  const s = Math.min(slot.width / bw, slot.height / bh, 1.4);
-  const tx = slot.left + slot.width / 2 - (s * (b[0][0] + b[1][0])) / 2;
-  const ty = slot.top + slot.height / 2 - (s * (b[0][1] + b[1][1])) / 2;
-  const el = document.querySelector("#map svg");
-  el.style.transform = `translate(${tx}px, ${ty}px) scale(${s})`;
-}
-
-function clearResultMapLayout() {
-  const el = document.querySelector("#map svg");
-  if (el) el.style.transform = "";
-}
-
 function showResult(g) {
   const n = g.visited.length;
   const root = document.getElementById("result");
@@ -101,10 +95,8 @@ function showResult(g) {
     ? t("result.untouchable")
     : `${t("result.caughtIn")} · ${iso3(g.caughtId)}`;
   document.getElementById("caught-name").textContent = countryName(g.finalId);
-  document.getElementById("caught-sub").textContent = g.won
-    ? t("result.win")
-    : t("result.extraditedTo", { country: countryName(g.currentTarget) });
-  setSilhouette(g.finalId);
+  setSub(g);
+  setFlag(g.finalId);
 
   const r = rankInfo(n);
   document.getElementById("rank-name").textContent = t(`rank.${r.cur.key}`);
@@ -129,14 +121,14 @@ function showResult(g) {
 
   // Wait a frame so the slot has its final size before fitting the map
   requestAnimationFrame(() => {
-    layoutResultMap();
+    buildResultMap();
     document.getElementById("result-restart").focus({ preventScroll: true });
   });
 }
 
 function hideResult() {
   document.getElementById("result").hidden = true;
-  clearResultMapLayout();
+  destroyResultMap();
 }
 
 async function shareResult() {

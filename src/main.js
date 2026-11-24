@@ -46,15 +46,11 @@ function redrawGeometry() {
   polyCache.clear();
   if (game.active || game.resultShown) drawTrail(game.visited, game.caughtId);
   else if (state.selectedId) drawArcs(state.selectedId, extradition[state.selectedId]?.treaties || []);
-  if (game.resultShown) layoutResultMap();
+  if (game.resultShown) buildResultMap();
 }
 
-// Fades the graticule toward the top and bottom with a vertical gradient in group coordinates
 function updateGraticule() {
-  const g = d3.geoGraticule10();
-  group.select(".graticule").attr("d", path(g));
-  const [[, y0], [, y1]] = path.bounds(g);
-  svg.select("#grat-grad").attr("y1", y0).attr("y2", y1);
+  drawGraticule(svg, group.select(".graticule"), path, "grat");
 }
 
 function bindCountryEvents(sel) {
@@ -112,25 +108,7 @@ async function init() {
     .attr("role", "img")
     .attr("aria-label", t("map.label"));
 
-  const grad = svg
-    .append("defs")
-    .append("linearGradient")
-    .attr("id", "grat-grad")
-    .attr("gradientUnits", "userSpaceOnUse")
-    .attr("x1", 0)
-    .attr("x2", 0);
-  [
-    [0, 0],
-    [0.28, 1],
-    [0.72, 1],
-    [1, 0],
-  ].forEach(([o, a]) =>
-    grad
-      .append("stop")
-      .attr("offset", o)
-      .style("stop-color", "var(--c-grid-line)")
-      .style("stop-opacity", `calc(${a} * var(--c-grid-op))`),
-  );
+  svg.append("defs");
 
   group = svg.append("g");
 
@@ -147,7 +125,7 @@ async function init() {
     });
   svg.call(zoom).on("dblclick.zoom", null);
 
-  group.append("path").attr("class", "graticule");
+  group.append("g").attr("class", "graticule");
   group.selectAll(".land").data(rest).join("path").attr("class", "land").attr("d", path);
   bindCountryEvents(
     group

@@ -38,6 +38,7 @@ const I18N = {
     "game.hint": "Click any country to jump there. A country with a treaty to {country} ends the game.",
     "game.hintTouch": "Tap a country, then tap it again to confirm the jump.",
     "result.close": "Close results",
+    "result.map": "Route map",
     "result.crossed": { one: "country crossed", other: "countries crossed" },
     "result.caughtIn": "Caught in",
     "result.extraditedTo": "Extradited to {country}",

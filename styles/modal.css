@@ -8,6 +8,7 @@
   padding: calc(var(--s-5) + env(safe-area-inset-top)) var(--s-4)
     calc(var(--s-6) + env(safe-area-inset-bottom));
   overflow-y: auto;
+  touch-action: pan-y; /* no page pinch-zoom here; the map below handles its own gestures */
 }
 
 #result[hidden] {
@@ -72,18 +73,104 @@
   font-weight: 700;
 }
 
+/* Only a placeholder: the real map is the full-screen #result-map behind the UI.
+   #result lets pointer events through, and only its cards and buttons catch them. */
+#result {
+  pointer-events: none;
+}
+
+#result > * {
+  pointer-events: auto;
+}
+
+#result > .result-scrim,
+#result > .result-head,
+#result > .result-hero,
+#result > #result-map-slot {
+  pointer-events: none;
+}
+
+#result-close,
+#result-zoom {
+  pointer-events: auto;
+}
+
 #result-map-slot {
+  position: relative;
   flex: 1 1 0;
   min-height: 150px;
+}
+
+#result-map {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  cursor: grab;
+}
+
+#result-map:active {
+  cursor: grabbing;
+}
+
+#result-map .country:hover {
+  fill: rgba(61, 245, 201, 0.55);
+  stroke: var(--c-selected-edge);
+  stroke-width: 1.4px;
+}
+
+#result-map .country.is-caught:hover {
+  fill: var(--c-treaty-soft);
+}
+
+#result-map-hover {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px 6px 6px;
+  border-radius: var(--r-inner);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  pointer-events: none;
+}
+
+#result-zoom {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--r-outer);
+}
+
+#result-zoom button {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--c-text);
+}
+
+#result-zoom .sep {
+  height: 1px;
+  margin: 0 8px;
+  background: var(--divider);
 }
 
 .caught {
   flex: none;
   display: flex;
   align-items: center;
-  gap: 14px;
-  min-height: 88px;
-  padding: 0 var(--s-4) 0 12px;
+  gap: 20px;
+  min-height: 91px;
+  padding: 8px var(--s-4) 8px 12px;
   border-radius: var(--radius);
   background: linear-gradient(
     90deg,
@@ -106,25 +193,33 @@
 
 .caught-shape {
   flex: none;
-  width: 64px;
-  height: 64px;
   display: flex;
+}
+
+/* Explicit 4:3 size: the card is 91px tall with 8px padding, so the flag leaves ~8% above and below */
+#caught-flag {
+  display: block;
+  width: 100px;
+  height: 75px;
+  border-radius: calc(var(--r-outer) - 8px);
+  background-size: cover;
+}
+
+/* Plaque of the country the player was extradited to */
+.caught-pill {
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  border-radius: var(--radius);
+  gap: 8px;
+  padding: 3px 12px 3px 8px;
+  border-radius: 6px;
   background: rgba(6, 8, 12, 0.6);
+  color: var(--c-text);
+  font-weight: 600;
 }
 
-.caught-shape path {
-  fill: var(--c-treaty);
-  stroke: var(--c-treaty-soft);
-  stroke-width: 1px;
-  stroke-linejoin: round;
-}
-
-.caught.is-win .caught-shape path {
-  fill: var(--c-safe);
-  stroke: #d5fff4;
+.caught-pill .fi {
+  font-size: 16px;
+  border-radius: 3px;
 }
 
 .caught-text {
@@ -152,8 +247,12 @@
 }
 
 #caught-sub {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0 8px;
   font-size: var(--fs-sm);
-  line-height: 16px;
+  line-height: 24px;
   color: var(--c-text-2);
 }
 
@@ -266,15 +365,23 @@
     width: 480px;
     padding: 32px;
     justify-content: center;
-    background: linear-gradient(
-      90deg,
-      rgba(6, 8, 12, 0.94) 75%,
-      rgba(6, 8, 12, 0)
-    );
   }
 
+  /* The dark panel behind the text is a scrim over the map, which spans the whole screen */
   .result-scrim {
-    display: none;
+    right: auto;
+    width: 680px;
+    /* 34% transparent at the left edge, then an eased fade (more stops = no visible edge) */
+    background: linear-gradient(
+      90deg,
+      rgba(6, 8, 12, 0.66) 0,
+      rgba(6, 8, 12, 0.64) 30%,
+      rgba(6, 8, 12, 0.53) 48%,
+      rgba(6, 8, 12, 0.36) 64%,
+      rgba(6, 8, 12, 0.19) 78%,
+      rgba(6, 8, 12, 0.07) 90%,
+      rgba(6, 8, 12, 0) 100%
+    );
   }
 
   #result-map-slot {

@@ -16,6 +16,8 @@
       rel="stylesheet"
     />
 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css" />
+
     <link rel="stylesheet" href="styles/tokens.css" />
     <link rel="stylesheet" href="styles/base.css" />
     <link rel="stylesheet" href="styles/map.css" />
@@ -95,7 +97,6 @@
     </div>
 
     <section id="sheet" class="glass is-empty" aria-label="Country details">
-      <div class="sheet-handle" aria-hidden="true"></div>
       <div id="sheet-empty">
         <p class="sheet-empty-title" data-i18n="sheet.empty.title">Select a country</p>
         <p class="sheet-empty-hint" data-i18n="sheet.empty.hint">Tap a country to see its extradition treaties.</p>
@@ -144,7 +145,6 @@
     </div>
 
     <section id="game-sheet" class="glass" aria-label="Current position and route">
-      <div class="sheet-handle" aria-hidden="true"></div>
       <div class="sheet-head">
         <p id="game-eyebrow" class="eyebrow"></p>
         <h2 id="game-country"></h2>
@@ -174,11 +174,25 @@
         <h2 id="result-count-label" class="result-count-label"></h2>
       </section>
 
-      <div id="result-map-slot" aria-hidden="true"></div>
+      <div id="result-map-slot" role="group" data-i18n-attr="aria-label:result.map" aria-label="Route map">
+        <div id="result-map-hover" class="glass" hidden>
+          <span id="result-map-hover-iso" class="iso"></span>
+          <span id="result-map-hover-name"></span>
+        </div>
+        <div id="result-zoom" class="glass">
+          <button id="result-zoom-in" type="button" data-i18n-attr="aria-label:zoom.in" aria-label="Zoom in">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
+          </button>
+          <span class="sep"></span>
+          <button id="result-zoom-out" type="button" data-i18n-attr="aria-label:zoom.out" aria-label="Zoom out">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14" /></svg>
+          </button>
+        </div>
+      </div>
 
       <section id="result-caught" class="caught" aria-label="Where you were caught">
         <div class="caught-shape">
-          <svg width="64" height="64" viewBox="-7 -7 64 64" aria-hidden="true"><path id="caught-path" d="" /></svg>
+          <span id="caught-flag" class="fi" aria-hidden="true"></span>
         </div>
         <div class="caught-text">
           <p id="caught-eyebrow" class="eyebrow"></p>
@@ -264,12 +278,14 @@
     <script src="data/iso.js"></script>
     <script src="src/i18n.js"></script>
     <script src="src/load_data.js"></script>
+    <script src="src/graticule.js"></script>
     <script src="src/arcs.js"></script>
     <script src="src/paint.js"></script>
     <script src="src/zoom_to_country.js"></script>
     <script src="src/state.js"></script>
     <script src="src/search_input.js"></script>
     <script src="src/game.js"></script>
+    <script src="src/result_map.js"></script>
     <script src="src/result.js"></script>
     <script src="src/about.js"></script>
     <!-- main.js is last: it starts the app -->

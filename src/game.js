@@ -137,10 +137,8 @@ const game = {
     setHoverName(null);
     showGameHover(null);
 
-    // Reset to the whole map so layoutResultMap() can fit it into the result slot
-    svg.call(zoom.transform, d3.zoomIdentity);
+    // The result screen draws its own map (result_map.js); the main one is hidden under it
     paintMap();
-    drawTrail(this.visited, caughtId);
     showResult(this);
   },
 

@@ -43,7 +43,9 @@
   --fs-title: 32px;
   --fs-hero: 96px;
 
-  --radius: 14px; /* the only corner radius used across the UI */
+  --r-outer: 14px; /* panels, sheets, cards */
+  --r-inner: 8px; /* elements inside a panel with ~6px padding; otherwise outer minus padding */
+  --radius: var(--r-outer);
 
   --s-1: 4px;
   --s-2: 8px;
