@@ -1,6 +1,7 @@
 /* Second plate: sits right under the drawer and slides out from beneath it (desktop),
    or slides over it from the right (phone, where the drawer fills the screen). */
-#about {
+#about,
+#lang-plate {
   position: fixed;
   z-index: calc(var(--z-modal) - 2); /* just below the drawer */
   top: 0;
@@ -22,48 +23,56 @@
     visibility 0s linear 0.3s;
 }
 
-#about.is-open {
+#about.is-open,
+#lang-plate.is-open {
   transform: none;
   visibility: visible;
   transition: transform 0.3s var(--ease);
 }
 
 @media (max-width: 768px) {
-  #about {
+  #about,
+  #lang-plate {
     z-index: calc(var(--z-modal) + 1); /* over the drawer */
   }
 }
 
 @media (min-width: 769px) {
-  #about {
+  #about,
+  #lang-plate {
     width: calc(var(--panel-w) + 2 * var(--s-5));
     padding-left: var(--s-5);
     padding-right: var(--s-5);
     transform: translateX(-102%); /* hidden behind the drawer */
   }
 
-  #about.is-open {
+  #about.is-open,
+  #lang-plate.is-open {
     transform: translateX(calc(100% - 1px)); /* right next to the drawer */
   }
 }
 
-#about h2 {
+#about h2,
+#lang-plate h2 {
   font-size: 22px;
   color: var(--c-text);
 }
 
-#about-close {
+#about-close,
+#lang-close {
   background: rgba(255, 255, 255, 0.08);
   color: var(--c-text);
 }
 
 @media (hover: hover) {
-  #about-close:hover {
+  #about-close:hover,
+  #lang-close:hover {
     background: rgba(255, 255, 255, 0.18);
   }
 }
 
-#about-close:active {
+#about-close:active,
+#lang-close:active {
   background: rgba(255, 255, 255, 0.26);
 }
 

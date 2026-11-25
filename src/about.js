@@ -15,6 +15,7 @@ function isAboutOpen() {
 }
 
 function setAbout(open, { refocus = false } = {}) {
+  if (open) setLangPlate(false); // one second plate at a time
   aboutEl.classList.toggle("is-open", open);
   aboutEl.inert = !open;
   aboutEl.setAttribute("aria-hidden", String(!open));

@@ -16,8 +16,15 @@ const norm = (s) =>
 
 function buildSearchIndex() {
   searchIndex = [...mapIds]
-    .map((id) => ({ id, name: countryName(id), norm: norm(countryName(id)), iso: iso3(id) }))
-    .sort((a, b) => a.name.localeCompare(b.name));
+    .map((id) => ({
+      id,
+      name: countryName(id),
+      // matches the localized name and the English one, so Latin input works in every UI language
+      norm: norm(countryName(id)),
+      normEn: norm(countries[id] || ""),
+      iso: iso3(id),
+    }))
+    .sort((a, b) => a.name.localeCompare(b.name, langLocale()));
 }
 
 function queryCountries(q) {
@@ -26,8 +33,8 @@ function queryCountries(q) {
   const starts = [];
   const includes = [];
   for (const c of searchIndex) {
-    if (c.norm.startsWith(n) || c.iso.toLowerCase() === n) starts.push(c);
-    else if (c.norm.includes(n)) includes.push(c);
+    if (c.norm.startsWith(n) || c.normEn.startsWith(n) || c.iso.toLowerCase() === n) starts.push(c);
+    else if (c.norm.includes(n) || c.normEn.includes(n)) includes.push(c);
   }
   return starts.concat(includes).slice(0, 6);
 }

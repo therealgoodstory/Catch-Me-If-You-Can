@@ -112,10 +112,7 @@ const game = {
       ? t("game.hintTouch")
       : t("game.hint", { country: countryName(cur) });
     hint.hidden = !(this.active && this.visited.length <= 1 && loadBest() === 0);
-    document.documentElement.style.setProperty(
-      "--hint-h",
-      hint.hidden ? "0px" : `${hint.offsetHeight + 8}px`,
-    );
+    layoutGameHints();
 
     const route = document.getElementById("game-route");
     route.replaceChildren();
@@ -197,3 +194,16 @@ function chevron() {
 
 document.getElementById("game-toggle").addEventListener("click", () => game.start());
 document.getElementById("game-exit").addEventListener("click", () => game.exit());
+
+// The prompt can wrap onto two lines (long translations), so the hint and the name pill
+// are positioned from its real bottom edge instead of a fixed offset.
+function layoutGameHints() {
+  const prompt = document.getElementById("game-prompt");
+  const hint = document.getElementById("game-hint");
+  const root = document.documentElement.style;
+  if (!prompt.offsetHeight) return;
+  const top = Math.round(prompt.getBoundingClientRect().bottom + 8);
+  root.setProperty("--hint-top", `${top}px`);
+  root.setProperty("--hint-h", hint.hidden ? "0px" : `${hint.offsetHeight + 8}px`);
+}
+window.addEventListener("resize", layoutGameHints);

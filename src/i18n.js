@@ -65,6 +65,7 @@ const I18N = {
     "menu.open": "Menu",
     "menu.close": "Close menu",
     "menu.about": "About and data",
+    "menu.language": "Language",
     "about.title": "About",
     "about.mapTitle": "The map",
     "about.mapText":
@@ -93,9 +94,52 @@ function t(key, params = {}) {
   return v.replace(/\{(\w+)\}/g, (_, k) => (params[k] ?? `{${k}}`));
 }
 
-// Country name by numeric id (English names from data/countries.js).
+// Country name by numeric id. English comes from data/countries.js; other languages from Intl.DisplayNames
+// (CLDR), falling back to English when the browser has no name for the region.
+let nameCache = new Map();
+let regionNames = null;
+
+function langLocale() {
+  return (typeof LANGS !== "undefined" && LANGS.find((l) => l.code === currentLang)?.locale) || currentLang;
+}
+
 function countryName(id) {
-  return countries[id] || String(id);
+  const en = countries[id] || String(id);
+  if (currentLang === "en") return en;
+  if (nameCache.has(id)) return nameCache.get(id);
+  let name = en;
+  try {
+    regionNames ||= new Intl.DisplayNames([langLocale()], { type: "region" });
+    const code = iso2(id);
+    const local = code && regionNames.of(code);
+    if (local && local !== code) name = local;
+  } catch {
+    /* Intl.DisplayNames unavailable: keep English */
+  }
+  nameCache.set(id, name);
+  return name;
+}
+
+// Switches the UI language and refreshes everything that is visible in explore mode.
+// (The menu is not reachable during a game or on the result screen, so those are not re-rendered.)
+function setLang(code) {
+  if (!I18N[code] || code === currentLang) return;
+  currentLang = code;
+  nameCache = new Map();
+  regionNames = null;
+  try {
+    localStorage.setItem(STORAGE_LANG, code);
+  } catch {
+    /* storage unavailable: the choice just is not remembered */
+  }
+  applyI18n();
+  document.querySelector("#map")?.setAttribute("aria-label", t("map.label"));
+  document.querySelector("#map svg")?.setAttribute("aria-label", t("map.label"));
+  buildSearchIndex();
+  renderCapsule();
+  renderSheet();
+  setHoverName(null);
+  renderLangMenu();
 }
 
 // Applies translations to the markup:

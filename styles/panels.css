@@ -291,6 +291,7 @@
 }
 
 #panel-toggle {
+  margin-left: auto;
   display: flex;
   align-items: center;
   gap: 2px;
@@ -468,7 +469,7 @@
 #game-hover {
   position: fixed;
   z-index: var(--z-ui);
-  top: calc(138px + var(--hint-h, 0px) + env(safe-area-inset-top));
+  top: calc(var(--hint-top, 138px) + var(--hint-h, 0px));
   left: var(--s-4);
   max-width: calc(100% - 32px);
   display: none;
@@ -549,7 +550,7 @@
   display: none;
   position: fixed;
   z-index: var(--z-ui);
-  top: calc(138px + env(safe-area-inset-top));
+  top: var(--hint-top, 138px);
   left: var(--s-4);
   max-width: calc(100% - 32px);
   align-items: flex-start;
@@ -632,8 +633,13 @@
     padding-bottom: var(--s-5);
   }
 
-  #panel-toggle {
+  #panel-toggle,
+  .sheet-row {
     display: none;
+  }
+
+  #sheet .tiles {
+    margin-bottom: var(--s-3);
   }
 
   .chips,
@@ -712,4 +718,35 @@
   #sheet.expanded .tiles {
     display: none;
   }
+}
+
+/* Language item and its plate: same .menu-item rows as the rest of the menu, with a flag */
+.menu-item .fi {
+  flex: none;
+  width: 22px;
+  height: 16px;
+  border-radius: 3px;
+  background-size: cover;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.18);
+}
+
+.menu-item .menu-value {
+  margin-left: auto;
+  font-weight: 500;
+  color: var(--c-text-3);
+}
+
+#lang-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  margin: 0;
+  padding: 0 0 calc(var(--s-5) + env(safe-area-inset-bottom));
+  list-style: none;
+  overflow-y: auto;
+}
+
+#lang-list .menu-item[aria-selected="true"] {
+  color: var(--c-safe);
+  border-color: rgba(61, 245, 201, 0.45);
 }

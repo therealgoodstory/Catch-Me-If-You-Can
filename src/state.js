@@ -42,18 +42,13 @@ function renderSheet() {
   const id = state.selectedId;
   sheet.classList.toggle("is-empty", !id);
   if (!id) {
-    sheet.classList.remove("expanded");
     state.renderedId = null;
     observeSheetHeight();
     return;
   }
-  // A newly selected country starts collapsed
-  if (state.renderedId !== id) {
-    sheet.classList.remove("expanded");
-    // a new country always starts at the top of the card (the body scrolls on desktop, the sheet itself on phones)
-    sheet.scrollTop = 0;
-    document.getElementById("sheet-body").scrollTop = 0;
-  }
+  // The expanded/collapsed state is the player's choice and stays across countries;
+  // a newly selected country only starts scrolled to the beginning
+  const changed = state.renderedId !== id;
   state.renderedId = id;
 
   const data = extradition[id];
@@ -78,7 +73,7 @@ function renderSheet() {
     box.append(p);
   } else {
     [...related]
-      .sort((a, b) => countryName(a).localeCompare(countryName(b)))
+      .sort((a, b) => countryName(a).localeCompare(countryName(b), langLocale()))
       .forEach((rid) => {
         const b = document.createElement("button");
         b.type = "button";
@@ -112,6 +107,23 @@ function renderSheet() {
 
   updateToggleLabel();
   observeSheetHeight();
+
+  // Scroll is reset after the new content is in place (and once more after layout settles):
+  // vertically (phone: the sheet itself, desktop: #sheet-body) and horizontally (the row of chips)
+  if (changed) {
+    resetSheetScroll();
+    requestAnimationFrame(resetSheetScroll);
+  }
+}
+
+function resetSheetScroll() {
+  for (const el of [
+    document.getElementById("sheet"),
+    document.getElementById("sheet-body"),
+    document.getElementById("country-extradition"),
+  ]) {
+    el.scrollTo({ top: 0, left: 0, behavior: "instant" });
+  }
 }
 
 function updateToggleLabel() {

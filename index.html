@@ -8,6 +8,7 @@
     />
     <meta name="theme-color" content="#06080c" />
     <title>Catch Me If You Can</title>
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -69,7 +70,22 @@
           <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 11v5.5M12 7.8v.01" /></svg>
           <span data-i18n="menu.about">About and data</span>
         </button>
+        <button id="menu-lang" class="menu-item" type="button" aria-expanded="false" aria-controls="lang-plate">
+          <span id="lang-current-flag" class="fi" aria-hidden="true"></span>
+          <span data-i18n="menu.language">Language</span>
+          <span id="lang-current-name" class="menu-value"></span>
+        </button>
       </nav>
+    </aside>
+
+    <aside id="lang-plate" class="glass" aria-labelledby="lang-title" aria-hidden="true" inert>
+      <div class="drawer-head">
+        <h2 id="lang-title" data-i18n="menu.language"></h2>
+        <button id="lang-close" class="icon-btn" type="button" data-i18n-attr="aria-label:about.close" aria-label="Close">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
+        </button>
+      </div>
+      <ul id="lang-list" role="listbox"></ul>
     </aside>
 
     <div id="search-wrap">
@@ -128,11 +144,10 @@
           <h2 id="country-name"></h2>
         </div>
         <div class="tiles">
-          <div class="tile"><span id="tile-treaty" class="tile-val" style="color: var(--c-treaty)">0</span><span class="tile-label" data-i18n="tile.treaty">Treaty partners</span></div>
-          <div class="tile"><span id="tile-none" class="tile-val">0</span><span class="tile-label" data-i18n="tile.none">No treaty</span></div>
+          <div class="stat"><span class="eyebrow" data-i18n="tile.treaty">Treaty partners</span><span id="tile-treaty" class="stat-val" style="color: var(--c-treaty)">0</span></div>
+          <div class="stat"><span class="eyebrow" data-i18n="tile.none">No treaty</span><span id="tile-none" class="stat-val">0</span></div>
         </div>
         <div class="sheet-row">
-          <span class="eyebrow" data-i18n="sheet.partners">Treaty partners</span>
           <button id="panel-toggle" type="button">
             <span id="panel-toggle-label"></span>
             <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" /></svg>
@@ -309,6 +324,7 @@
     <script src="data/countries.js"></script>
     <script src="data/iso.js"></script>
     <script src="src/i18n.js"></script>
+    <script src="src/locales.js"></script>
     <script src="src/load_data.js"></script>
     <script src="src/graticule.js"></script>
     <script src="src/arcs.js"></script>
@@ -322,6 +338,7 @@
     <script src="src/result.js"></script>
     <script src="src/about.js"></script>
     <script src="src/menu.js"></script>
+    <script src="src/lang_menu.js"></script>
     <!-- main.js is last: it starts the app -->
     <script src="src/main.js"></script>
   </body>
