@@ -99,6 +99,7 @@ function showResult(g) {
   setFlag(g.finalId);
 
   const r = rankInfo(n);
+  document.getElementById("rank-icon").src = `assets/ranks/${r.cur.key}.svg`;
   document.getElementById("rank-name").textContent = t(`rank.${r.cur.key}`);
   document.getElementById("rank-next").textContent = r.next
     ? t("result.toNext", { n: r.remaining, rank: t(`rank.${r.next.key}`) })

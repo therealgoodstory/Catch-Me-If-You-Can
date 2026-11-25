@@ -250,6 +250,12 @@
   padding: 4px 0;
 }
 
+.rank-icon {
+  flex: none;
+  width: 64px;
+  height: 64px;
+}
+
 .rank-body {
   flex: 1;
   min-width: 0;
@@ -292,16 +298,19 @@
   transition: width 0.8s var(--ease);
 }
 
-.result-tiles {
+.result-stats {
   flex: none;
+  display: flex;
+  gap: 28px;
+  margin-top: 14px;
   padding-bottom: 8px;
 }
 
-.tile-best .tile-val {
-  color: var(--c-safe);
+.result-stats .stat {
+  padding: 0;
 }
 
-.tile-val-row {
+.stat-val-row {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -345,6 +354,23 @@
     width: 480px;
     padding: 32px;
     justify-content: center;
+  }
+
+  /* Desktop: the whole stats column is UI, so dragging or scrolling over it never moves the map */
+  #result,
+  #result > .result-head,
+  #result > .result-hero {
+    pointer-events: auto;
+  }
+
+  /* The map svg paints above the column's own box, so an explicit invisible plate catches the pointer.
+     ::after + z-index -1 puts it above the svg (later in tree order) but below all the UI. */
+  #result::after {
+    content: "";
+    position: fixed;
+    inset: 0 auto 0 0;
+    width: 480px;
+    z-index: -1;
   }
 
   /* The dark panel behind the text is a scrim over the map, which spans the whole screen */

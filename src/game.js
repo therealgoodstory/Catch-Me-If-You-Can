@@ -106,9 +106,16 @@ const game = {
     const cur = this.currentTarget;
     document.getElementById("game-eyebrow").textContent = `${t("game.youAreIn")} · ${iso3(cur)}`;
     document.getElementById("game-country").textContent = countryName(cur);
-    document.getElementById("game-hint").textContent = isTouch()
+    // Rules hint: only for new players (no saved best) and only until the first jump
+    const hint = document.getElementById("game-hint");
+    document.getElementById("game-hint-text").textContent = isTouch()
       ? t("game.hintTouch")
       : t("game.hint", { country: countryName(cur) });
+    hint.hidden = !(this.active && this.visited.length <= 1 && loadBest() === 0);
+    document.documentElement.style.setProperty(
+      "--hint-h",
+      hint.hidden ? "0px" : `${hint.offsetHeight + 8}px`,
+    );
 
     const route = document.getElementById("game-route");
     route.replaceChildren();

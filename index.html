@@ -38,18 +38,39 @@
           <path d="M15 1v6M15 23v6M1 15h6M23 15h6" stroke="#3df5c9" stroke-width="2" stroke-linecap="round" />
         </svg>
         <h1 class="wordmark">CATCH ME<br />IF YOU CAN</h1>
-        <button id="about-btn" class="icon-btn about-btn" type="button" data-i18n-attr="aria-label:about.open">
-          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-            <circle cx="12" cy="12" r="9" />
-            <path d="M12 11v5.5M12 7.8v.01" />
-          </svg>
+      </div>
+      <div class="top-actions">
+        <button id="menu-btn" class="icon-btn glass" type="button" aria-expanded="false" aria-controls="drawer" data-i18n-attr="aria-label:menu.open">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
+        </button>
+        <button id="game-toggle" class="btn-primary btn-play" type="button">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5l11 6.5-11 6.5z" /></svg>
+          <span data-i18n="play">Play</span>
         </button>
       </div>
-      <button id="game-toggle" class="btn-primary btn-play" type="button">
-        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5l11 6.5-11 6.5z" /></svg>
-        <span data-i18n="play">Play</span>
-      </button>
     </header>
+
+    <aside id="drawer" class="glass" aria-label="Menu" aria-hidden="true" inert>
+      <div class="drawer-head">
+        <div class="brand">
+          <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true">
+            <circle cx="15" cy="15" r="11" fill="none" stroke="#3df5c9" stroke-width="2" />
+            <circle cx="15" cy="15" r="4" fill="#3df5c9" />
+            <path d="M15 1v6M15 23v6M1 15h6M23 15h6" stroke="#3df5c9" stroke-width="2" stroke-linecap="round" />
+          </svg>
+          <span class="wordmark">CATCH ME<br />IF YOU CAN</span>
+        </div>
+        <button id="drawer-close" class="icon-btn" type="button" data-i18n-attr="aria-label:menu.close" aria-label="Close menu">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
+        </button>
+      </div>
+      <nav class="drawer-list">
+        <button id="menu-about" class="menu-item" type="button">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 11v5.5M12 7.8v.01" /></svg>
+          <span data-i18n="menu.about">About and data</span>
+        </button>
+      </nav>
+    </aside>
 
     <div id="search-wrap">
       <div id="search-capsule" class="glass">
@@ -123,13 +144,20 @@
     </section>
 
     <header id="game-hud" class="glass">
-      <button id="game-exit" class="icon-btn" type="button" data-i18n-attr="aria-label:game.exit" aria-label="Exit game">
-        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
-      </button>
+      <div class="brand hud-brand">
+        <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true">
+          <circle cx="15" cy="15" r="11" fill="none" stroke="#3df5c9" stroke-width="2" />
+          <circle cx="15" cy="15" r="4" fill="#3df5c9" />
+          <path d="M15 1v6M15 23v6M1 15h6M23 15h6" stroke="#3df5c9" stroke-width="2" stroke-linecap="round" />
+        </svg>
+        <span class="wordmark">CATCH ME<br />IF YOU CAN</span>
+      </div>
       <div class="spacer"></div>
       <div class="stat"><span class="eyebrow" data-i18n="game.countries">Countries</span><span id="hud-count" class="stat-val">00</span></div>
       <div class="stat"><span class="eyebrow" data-i18n="game.safeLeft">Safe left</span><span id="hud-safe" class="stat-val safe">0</span></div>
-      <div style="width: 14px"></div>
+      <button id="game-exit" class="icon-btn" type="button" data-i18n-attr="aria-label:game.exit" aria-label="Exit game">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
+      </button>
     </header>
 
     <div id="map-tip" class="glass" hidden>
@@ -141,6 +169,11 @@
       <span class="prompt-dot"></span>
       <span id="game-prompt-text"></span>
     </div>
+
+    <p id="game-hint" class="hint" hidden>
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 11v5.5M12 7.8v.01" /></svg>
+      <span id="game-hint-text"></span>
+    </p>
 
     <div id="game-hover" class="glass" hidden>
       <span id="game-hover-iso" class="iso"></span>
@@ -157,7 +190,6 @@
         <p class="eyebrow" style="margin-bottom: 8px" data-i18n="game.route">Your route</p>
         <div id="game-route" class="route"></div>
       </div>
-      <p id="game-hint" class="hint"></p>
     </section>
 
     <div id="result" hidden role="dialog" aria-modal="true" aria-labelledby="result-count-label">
@@ -202,10 +234,7 @@
       </section>
 
       <section class="rank" aria-label="Rank">
-        <svg width="56" height="56" viewBox="0 0 56 56" aria-hidden="true" style="flex: none">
-          <path d="M28 3l22 12.5v25L28 53 6 40.5v-25z" fill="rgba(61,245,201,.12)" stroke="#3df5c9" stroke-width="2" stroke-linejoin="round" />
-          <path d="M28 17l9 11-9 11-9-11z" fill="#3df5c9" />
-        </svg>
+        <img id="rank-icon" class="rank-icon" src="assets/ranks/rookie.svg" width="64" height="64" alt="" />
         <div class="rank-body">
           <div class="rank-line">
             <span class="eyebrow" data-i18n="result.rank">Rank</span>
@@ -218,12 +247,12 @@
         </div>
       </section>
 
-      <div class="tiles result-tiles">
-        <div class="tile"><span id="res-world" class="tile-val">0%</span><span class="tile-label" data-i18n="result.world">World covered</span></div>
-        <div class="tile"><span id="res-km" class="tile-val">0</span><span class="tile-label" data-i18n="result.km">km fled</span></div>
-        <div class="tile tile-best">
-          <span class="tile-val-row"><span id="res-best" class="tile-val">0</span><span id="res-new" class="badge-new" hidden data-i18n="result.new">NEW</span></span>
-          <span class="tile-label" data-i18n="result.best">Personal best</span>
+      <div class="result-stats">
+        <div class="stat"><span class="eyebrow" data-i18n="result.world">World covered</span><span id="res-world" class="stat-val">0%</span></div>
+        <div class="stat"><span class="eyebrow" data-i18n="result.km">km fled</span><span id="res-km" class="stat-val">0</span></div>
+        <div class="stat">
+          <span class="eyebrow" data-i18n="result.best">Personal best</span>
+          <span class="stat-val-row"><span id="res-best" class="stat-val safe">0</span><span id="res-new" class="badge-new" hidden data-i18n="result.new">NEW</span></span>
         </div>
       </div>
 
@@ -245,10 +274,14 @@
       </div>
     </div>
 
-    <div id="about" role="dialog" aria-modal="true" aria-labelledby="about-title" hidden>
-      <div id="about-scrim"></div>
-      <div id="about-card" class="glass">
+    <aside id="about" class="glass" aria-labelledby="about-title" aria-hidden="true" inert>
+      <div class="drawer-head">
         <h2 id="about-title" data-i18n="about.title"></h2>
+        <button id="about-close" class="icon-btn" type="button" data-i18n-attr="aria-label:about.close" aria-label="Close">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
+        </button>
+      </div>
+      <div class="about-body">
         <section>
           <h3 data-i18n="about.mapTitle"></h3>
           <p data-i18n="about.mapText"></p>
@@ -266,9 +299,8 @@
           <a id="link-github" class="btn-ghost" target="_blank" rel="noopener noreferrer" hidden data-i18n="about.github"></a>
           <a id="link-coffee" class="btn-ghost" target="_blank" rel="noopener noreferrer" hidden data-i18n="about.coffee"></a>
         </div>
-        <button id="about-close" class="btn-ghost" type="button" data-i18n="about.close"></button>
       </div>
-    </div>
+    </aside>
 
     <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
     <script src="https://cdn.jsdelivr.net/npm/topojson@3"></script>
@@ -289,6 +321,7 @@
     <script src="src/result_map.js"></script>
     <script src="src/result.js"></script>
     <script src="src/about.js"></script>
+    <script src="src/menu.js"></script>
     <!-- main.js is last: it starts the app -->
     <script src="src/main.js"></script>
   </body>

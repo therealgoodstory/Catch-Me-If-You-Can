@@ -1,76 +1,96 @@
-/* Deliberately low-key: a muted outline icon next to the app name */
-.about-btn {
-  color: var(--c-text-3);
-  margin-left: calc(var(--s-1) * -1);
-}
-
-.about-btn .icon {
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.8;
-  stroke-linecap: round;
-}
-
-.about-btn:hover {
-  color: var(--c-text);
-}
-
+/* Second plate: sits right under the drawer and slides out from beneath it (desktop),
+   or slides over it from the right (phone, where the drawer fills the screen). */
 #about {
   position: fixed;
-  inset: 0;
-  z-index: var(--z-modal);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--s-4);
-}
-
-#about[hidden] {
-  display: none;
-}
-
-#about-scrim {
-  position: absolute;
-  inset: 0;
-  background: rgba(3, 5, 9, 0.6);
-}
-
-#about-card {
-  position: relative;
-  width: min(100%, 380px);
+  z-index: calc(var(--z-modal) - 2); /* just below the drawer */
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
   display: flex;
   flex-direction: column;
-  gap: var(--s-3);
-  padding: var(--s-5);
-  border-radius: var(--radius);
-  line-height: 1.5;
-  font-size: var(--fs-md);
-  color: var(--c-text-2);
-  max-height: calc(100dvh - 32px);
-  overflow-y: auto;
+  gap: var(--s-4);
+  padding: calc(var(--s-5) + env(safe-area-inset-top)) var(--s-4) 0;
+  border-width: 0 1px 0 0;
+  border-radius: 0;
+  background: #0b101a;
+  box-shadow: 12px 0 40px rgba(0, 0, 0, 0.35);
+  transform: translateX(102%);
+  visibility: hidden;
+  transition:
+    transform 0.3s var(--ease),
+    visibility 0s linear 0.3s;
 }
 
-#about-card section {
-  display: flex;
-  flex-direction: column;
-  gap: var(--s-2);
+#about.is-open {
+  transform: none;
+  visibility: visible;
+  transition: transform 0.3s var(--ease);
 }
 
-#about-card h3 {
-  font: 600 12px / 1 var(--font-mono);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--c-text-3);
+@media (max-width: 768px) {
+  #about {
+    z-index: calc(var(--z-modal) + 1); /* over the drawer */
+  }
 }
 
-#about-card h2 {
+@media (min-width: 769px) {
+  #about {
+    width: calc(var(--panel-w) + 2 * var(--s-5));
+    padding-left: var(--s-5);
+    padding-right: var(--s-5);
+    transform: translateX(-102%); /* hidden behind the drawer */
+  }
+
+  #about.is-open {
+    transform: translateX(calc(100% - 1px)); /* right next to the drawer */
+  }
+}
+
+#about h2 {
   font-size: 22px;
   color: var(--c-text);
 }
 
 #about-close {
-  height: var(--hit);
-  margin-top: var(--s-2);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--c-text);
+}
+
+@media (hover: hover) {
+  #about-close:hover {
+    background: rgba(255, 255, 255, 0.18);
+  }
+}
+
+#about-close:active {
+  background: rgba(255, 255, 255, 0.26);
+}
+
+.about-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+  padding-bottom: calc(var(--s-5) + env(safe-area-inset-bottom));
+  line-height: 1.5;
+  font-size: var(--fs-md);
+  color: var(--c-text-2);
+}
+
+.about-body section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+}
+
+.about-body h3 {
+  font: 600 12px / 1 var(--font-mono);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--c-text-3);
 }
 
 .about-links {

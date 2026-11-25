@@ -35,8 +35,8 @@ const I18N = {
     "game.tapAgain": "Tap again to jump",
     "game.youAreIn": "You are in",
     "game.route": "Your route",
-    "game.hint": "Click any country to jump there. A country with a treaty to {country} ends the game.",
-    "game.hintTouch": "Tap a country, then tap it again to confirm the jump.",
+    "game.hint": "Goal: make as many jumps as you can without being extradited. Every country you jump to becomes your new location, and any country with an extradition treaty to it can hand you over.\nYou can enter each country only once.",
+    "game.hintTouch": "Goal: make as many jumps as you can without being extradited. Every country you jump to becomes your new location, and any country with an extradition treaty to it can hand you over.\nYou can enter each country only once.",
     "result.close": "Close results",
     "result.map": "Route map",
     "result.crossed": { one: "country crossed", other: "countries crossed" },
@@ -62,7 +62,9 @@ const I18N = {
     "rank.phantom": "Phantom",
     "rank.legend": "Legend",
 
-    "about.open": "About and data notice",
+    "menu.open": "Menu",
+    "menu.close": "Close menu",
+    "menu.about": "About and data",
     "about.title": "About",
     "about.mapTitle": "The map",
     "about.mapText":

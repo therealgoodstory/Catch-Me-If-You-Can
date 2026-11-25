@@ -1,6 +1,6 @@
-// Info dialog with the data disclaimer. Closes on the button, the backdrop or Escape.
+// "About and data": a second plate that slides out from under the menu drawer.
+// Its own cross closes only this plate; the drawer stays open.
 const aboutEl = document.getElementById("about");
-const aboutBtn = document.getElementById("about-btn");
 
 ["github", "coffee"].forEach((key) => {
   const a = document.getElementById(`link-${key}`);
@@ -10,19 +10,17 @@ const aboutBtn = document.getElementById("about-btn");
   }
 });
 
-function openAbout() {
-  aboutEl.hidden = false;
-  document.getElementById("about-close").focus();
+function isAboutOpen() {
+  return aboutEl.classList.contains("is-open");
 }
 
-function closeAbout() {
-  aboutEl.hidden = true;
-  aboutBtn.focus();
+function setAbout(open, { refocus = false } = {}) {
+  aboutEl.classList.toggle("is-open", open);
+  aboutEl.inert = !open;
+  aboutEl.setAttribute("aria-hidden", String(!open));
+  document.getElementById("menu-about").setAttribute("aria-expanded", String(open));
+  if (open) document.getElementById("about-close").focus();
+  else if (refocus) document.getElementById("menu-about").focus();
 }
 
-aboutBtn.addEventListener("click", openAbout);
-document.getElementById("about-close").addEventListener("click", closeAbout);
-document.getElementById("about-scrim").addEventListener("click", closeAbout);
-window.addEventListener("keydown", (e) => {
-  if (e.key === "Escape" && !aboutEl.hidden) closeAbout();
-});
+document.getElementById("about-close").addEventListener("click", () => setAbout(false, { refocus: true }));

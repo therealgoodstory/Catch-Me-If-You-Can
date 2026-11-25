@@ -48,7 +48,12 @@ function renderSheet() {
     return;
   }
   // A newly selected country starts collapsed
-  if (state.renderedId !== id) sheet.classList.remove("expanded");
+  if (state.renderedId !== id) {
+    sheet.classList.remove("expanded");
+    // a new country always starts at the top of the card (the body scrolls on desktop, the sheet itself on phones)
+    sheet.scrollTop = 0;
+    document.getElementById("sheet-body").scrollTop = 0;
+  }
   state.renderedId = id;
 
   const data = extradition[id];
