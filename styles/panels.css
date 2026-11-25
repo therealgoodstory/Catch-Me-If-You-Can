@@ -162,7 +162,7 @@
 #sheet-body {
   display: flex;
   flex-direction: column;
-  gap: var(--s-3);
+  gap: var(--s-2);
 }
 
 #country-name,
@@ -292,6 +292,16 @@
   color: var(--c-text);
 }
 
+@media (hover: hover) {
+  #game-exit:hover {
+    background: rgba(255, 255, 255, 0.18);
+  }
+}
+
+#game-exit:active {
+  background: rgba(255, 255, 255, 0.26);
+}
+
 #game-hud .spacer {
   flex: 1;
 }
@@ -310,12 +320,6 @@
 
 .stat-val.safe {
   color: var(--c-safe);
-}
-
-.stat-sep {
-  width: 1px;
-  height: 30px;
-  background: var(--divider);
 }
 
 #game-prompt {
@@ -375,6 +379,11 @@
 
 @media (hover: hover) {
   #game-hover-tap {
+    display: none;
+  }
+
+  /* The cursor tooltip shows the name during the game too */
+  .in-game #game-hover:not([hidden]) {
     display: none;
   }
 }
@@ -503,5 +512,16 @@
     left: var(--s-5);
     right: auto;
     bottom: 76px;
+  }
+}
+
+@media (max-width: 768px) {
+  /* The expanded list takes a third of the screen and scrolls inside; the counters make room for it */
+  #sheet.expanded {
+    max-height: 35dvh;
+  }
+
+  #sheet.expanded .tiles {
+    display: none;
   }
 }

@@ -128,7 +128,8 @@ searchInput.addEventListener("input", () => {
 });
 
 searchInput.addEventListener("focus", () => {
-  if (state.selectedId) searchInput.select();
+  // The selected country's name gives way to an empty field; blur brings it back if nothing was chosen
+  if (state.selectedId) searchInput.value = "";
 });
 
 searchInput.addEventListener("blur", () => {

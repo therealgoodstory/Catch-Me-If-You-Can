@@ -53,6 +53,32 @@ function updateGraticule() {
   drawGraticule(svg, group.select(".graticule"), path, "grat");
 }
 
+// The tooltip follows the pointer from one document-level listener instead of per-country
+// enter/leave events: those fire again when a country is re-raised in the DOM (paintMap) or while
+// d3-zoom handles a pressed button, and used to hide the tip when the mouse was held down.
+let tipCountryId = null;
+function bindMapTip() {
+  const mapEl = document.getElementById("map");
+  document.addEventListener("mousemove", (event) => {
+    if (isTouch() || game.resultShown) return;
+    const el = event.target.closest?.(".country");
+    const d = el && mapEl.contains(el) ? el.__data__ : null;
+    if (!d || event.buttons) {
+      tipCountryId = null;
+      mapTip.hide();
+    } else if (d.id !== tipCountryId || !mapTip.visible()) {
+      tipCountryId = d.id;
+      mapTip.show(d.id, event);
+    } else {
+      mapTip.move(event);
+    }
+  });
+  document.documentElement.addEventListener("mouseleave", () => {
+    tipCountryId = null;
+    mapTip.hide();
+  });
+}
+
 function bindCountryEvents(sel) {
   sel
     .on("mouseenter", (event, d) => {
@@ -160,6 +186,7 @@ async function init() {
   });
 
   zoomButtons();
+  bindMapTip();
 
   let rt;
   window.addEventListener("resize", () => {

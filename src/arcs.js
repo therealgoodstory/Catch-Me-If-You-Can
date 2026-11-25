@@ -118,7 +118,7 @@ function drawTrail(ids, fatalId = null) {
   pts.forEach((p, i) => {
     if (!p) return;
     const isLast = i === pts.length - 1;
-    if (i === 0 && pts.length > 1) addDot("marker-start", p, 4.5);
+    if (i === 0 && pts.length > 1) addDot("marker-start", p, 5.5);
     else if (isLast && !fatal) {
       addDot("marker-origin-ring", p, 12);
       addDot("marker-origin", p, 4.5);

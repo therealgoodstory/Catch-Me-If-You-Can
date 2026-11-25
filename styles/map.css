@@ -164,9 +164,9 @@
 }
 
 .marker-start {
-  fill: var(--c-bg);
-  stroke: var(--c-safe);
-  stroke-width: 2px;
+  fill: var(--c-treaty);
+  stroke: var(--c-bg);
+  stroke-width: 1.5px;
   vector-effect: non-scaling-stroke;
 }
 
@@ -187,4 +187,21 @@
   .country {
     transition: none;
   }
+}
+
+/* Name tooltip above the cursor. It replaces the static name pills on desktop. */
+#map-tip {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: calc(var(--z-modal) + 1); /* above the result screen too */
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px 6px 6px;
+  border-radius: var(--r-outer);
+  font-size: var(--fs-md);
+  font-weight: 600;
+  white-space: nowrap;
+  pointer-events: none;
 }

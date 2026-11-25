@@ -128,10 +128,14 @@
       </button>
       <div class="spacer"></div>
       <div class="stat"><span class="eyebrow" data-i18n="game.countries">Countries</span><span id="hud-count" class="stat-val">00</span></div>
-      <div class="stat-sep"></div>
       <div class="stat"><span class="eyebrow" data-i18n="game.safeLeft">Safe left</span><span id="hud-safe" class="stat-val safe">0</span></div>
       <div style="width: 14px"></div>
     </header>
+
+    <div id="map-tip" class="glass" hidden>
+      <span id="map-tip-iso" class="iso"></span>
+      <span id="map-tip-name"></span>
+    </div>
 
     <div id="game-prompt" class="glass" role="status" aria-live="polite">
       <span class="prompt-dot"></span>
@@ -175,10 +179,6 @@
       </section>
 
       <div id="result-map-slot" role="group" data-i18n-attr="aria-label:result.map" aria-label="Route map">
-        <div id="result-map-hover" class="glass" hidden>
-          <span id="result-map-hover-iso" class="iso"></span>
-          <span id="result-map-hover-name"></span>
-        </div>
         <div id="result-zoom" class="glass">
           <button id="result-zoom-in" type="button" data-i18n-attr="aria-label:zoom.in" aria-label="Zoom in">
             <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
@@ -201,7 +201,7 @@
         </div>
       </section>
 
-      <section class="rank glass" aria-label="Rank">
+      <section class="rank" aria-label="Rank">
         <svg width="56" height="56" viewBox="0 0 56 56" aria-hidden="true" style="flex: none">
           <path d="M28 3l22 12.5v25L28 53 6 40.5v-25z" fill="rgba(61,245,201,.12)" stroke="#3df5c9" stroke-width="2" stroke-linejoin="round" />
           <path d="M28 17l9 11-9 11-9-11z" fill="#3df5c9" />
@@ -285,6 +285,7 @@
     <script src="src/state.js"></script>
     <script src="src/search_input.js"></script>
     <script src="src/game.js"></script>
+    <script src="src/map_tip.js"></script>
     <script src="src/result_map.js"></script>
     <script src="src/result.js"></script>
     <script src="src/about.js"></script>

@@ -3,21 +3,10 @@
 // Only the countries the player visited (plus the one that caught them) react to hover and tap.
 let resultMap = null; // { svg, zoom }
 
-function showResultHover(id) {
-  const el = document.getElementById("result-map-hover");
-  if (!id) {
-    el.hidden = true;
-    return;
-  }
-  document.getElementById("result-map-hover-iso").textContent = iso3(id);
-  document.getElementById("result-map-hover-name").textContent = countryName(id);
-  el.hidden = false;
-}
-
 function destroyResultMap() {
   document.getElementById("result-map")?.remove();
   resultMap = null;
-  showResultHover(null);
+  mapTip.hide();
 }
 
 function buildResultMap() {
@@ -74,12 +63,15 @@ function buildResultMap() {
     .attr("class", (d) => "country is-visited" + (d.id === game.finalId ? " is-caught" : ""))
     .attr("d", geo)
     .on("mouseenter", (event, d) => {
-      if (!isTouch()) showResultHover(d.id);
+      if (!isTouch()) mapTip.show(d.id, event);
+    })
+    .on("mousemove", (event) => {
+      if (!isTouch()) mapTip.move(event);
     })
     .on("mouseleave", () => {
-      if (!isTouch()) showResultHover(null);
+      if (!isTouch()) mapTip.hide();
     })
-    .on("click", (event, d) => showResultHover(d.id));
+    .on("click", (event, d) => isTouch() && mapTip.show(d.id, event)); // on touch screens a tap shows the name
 
   // Route: dotted line through the visited countries, amber arc into the country that caught the player
   const overlay = root.append("g").attr("class", "overlay");
@@ -105,7 +97,7 @@ function buildResultMap() {
   pts.forEach((p, i) => {
     if (!p) return;
     const isLast = i === pts.length - 1;
-    if (i === 0 && pts.length > 1) dot("marker-start", p, 4.5);
+    if (i === 0 && pts.length > 1) dot("marker-start", p, 5.5);
     else if (isLast && !fatal) {
       dot("marker-origin-ring", p, 12);
       dot("marker-origin", p, 4.5);
@@ -130,6 +122,9 @@ function buildResultMap() {
     ])
     .on("zoom", (event) => {
       root.attr("transform", event.transform);
+      // A touch drag moves the map away from under a tapped country's name. With a mouse the tooltip
+      // keeps following whatever is under the cursor (mouseenter and mouseleave still fire while dragging).
+      if (event.sourceEvent?.type?.startsWith("touch")) mapTip.hide();
       const k = event.transform.k;
       overlay.selectAll("circle").attr("r", function () {
         return this.getAttribute("data-r") / k;
@@ -138,7 +133,7 @@ function buildResultMap() {
   svg.call(zoomBehavior);
   // A tap on empty map hides the name (the name of a tapped country stays until then)
   svg.on("click", (event) => {
-    if (!event.target.closest(".country")) showResultHover(null);
+    if (!event.target.closest(".country")) mapTip.hide();
   });
 
   resultMap = { svg, zoom: zoomBehavior };

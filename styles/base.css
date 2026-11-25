@@ -112,23 +112,19 @@ a {
 
 .tiles {
   display: flex;
-  gap: var(--s-2);
+  gap: 28px;
 }
 
+/* Read-only figure: number over a caption. No box and no dividers, so it never looks clickable */
 .tile {
-  flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 2px;
-  padding: 10px 12px;
-  border-radius: var(--radius);
-  background: var(--tile-bg);
-  border: 1px solid var(--tile-border);
 }
 
 .tile-val {
-  font: 700 24px / 28px var(--font-mono);
+  font: 700 24px / 26px var(--font-mono);
 }
 
 .tile-label {
@@ -164,4 +160,57 @@ a {
   color: var(--c-text-3);
   font-size: var(--fs-sm);
   padding: var(--s-2) 0;
+}
+
+/* Button feedback: hover (mouse devices only), pressed and keyboard focus */
+button,
+.btn-ghost,
+#country-source {
+  transition:
+    background-color var(--dur) var(--ease),
+    border-color var(--dur) var(--ease),
+    color var(--dur) var(--ease),
+    filter var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease),
+    transform var(--dur) var(--ease);
+}
+
+#zoom-ctl,
+#result-zoom {
+  overflow: hidden; /* the hover fill follows the rounded corners */
+}
+
+@media (hover: hover) {
+  .icon-btn:not(:disabled):hover,
+  #zoom-ctl button:hover,
+  #result-zoom button:hover {
+    background: rgba(255, 255, 255, 0.09);
+    color: var(--c-text);
+  }
+
+  .btn-primary:not(:disabled):hover {
+    filter: brightness(1.1);
+    box-shadow: 0 0 32px rgba(61, 245, 201, 0.55);
+  }
+
+  .btn-ghost:not(:disabled):hover {
+    background: rgba(255, 255, 255, 0.13);
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+
+  #panel-toggle:hover,
+  #country-source:hover {
+    color: var(--c-treaty-soft);
+  }
+}
+
+.icon-btn:not(:disabled):active,
+#zoom-ctl button:active,
+#result-zoom button:active {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.btn-primary:not(:disabled):active,
+.btn-ghost:not(:disabled):active {
+  transform: scale(0.98);
 }

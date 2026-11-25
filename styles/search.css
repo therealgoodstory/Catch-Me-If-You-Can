@@ -114,8 +114,5 @@
   font-weight: 500;
 }
 
-@media (hover: hover) and (min-width: 769px) {
-  #country-hover-name {
-    display: block;
-  }
-}
+/* On hover-capable screens the cursor tooltip (#map-tip) shows the name instead of this pill */
+

@@ -1,5 +1,6 @@
 const state = {
   selectedId: null,
+  renderedId: null, // country the sheet was last rendered for
 
   select(id) {
     this.selectedId = id;
@@ -42,9 +43,13 @@ function renderSheet() {
   sheet.classList.toggle("is-empty", !id);
   if (!id) {
     sheet.classList.remove("expanded");
+    state.renderedId = null;
     observeSheetHeight();
     return;
   }
+  // A newly selected country starts collapsed
+  if (state.renderedId !== id) sheet.classList.remove("expanded");
+  state.renderedId = id;
 
   const data = extradition[id];
   const related = data?.treaties || [];
@@ -105,14 +110,22 @@ function renderSheet() {
 }
 
 function updateToggleLabel() {
+  if (!state.selectedId) return; // also runs on font load, possibly before the data exists
   const sheet = document.getElementById("sheet");
   const n = extradition[state.selectedId]?.treaties?.length || 0;
   const toggle = document.getElementById("panel-toggle");
-  toggle.hidden = n === 0;
-  document.getElementById("panel-toggle-label").textContent = sheet.classList.contains("expanded")
+  const box = document.getElementById("country-extradition");
+  const expanded = sheet.classList.contains("expanded");
+  // "See all" only makes sense when the chips do not fit in one row; "Show less" stays while expanded
+  toggle.hidden = n === 0 || (!expanded && box.scrollWidth <= box.clientWidth + 1);
+  document.getElementById("panel-toggle-label").textContent = expanded
     ? t("sheet.less")
     : t("sheet.seeAll", { n });
 }
+
+// Chip widths depend on the font and the window width
+document.fonts?.ready.then(updateToggleLabel);
+window.addEventListener("resize", updateToggleLabel);
 
 document.getElementById("panel-toggle").addEventListener("click", () => {
   document.getElementById("sheet").classList.toggle("expanded");
@@ -132,6 +145,8 @@ function renderCapsule() {
     clear.hidden = false;
   } else {
     badge.hidden = true;
+    // The selection is gone, so the old name must go too (unless the user is typing a new query)
+    if (document.activeElement !== input) input.value = "";
     clear.hidden = input.value === "";
   }
 }
